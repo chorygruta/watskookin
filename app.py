@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
+from flask.ext.heroku import Heroku
 from flask_admin import Admin
 import json
 import sys
@@ -9,6 +10,8 @@ import sys
 app = Flask(__name__)
 
 app.config.from_pyfile('config.py')
+
+heroku = Heroku(app)
 
 db = SQLAlchemy(app)
 
