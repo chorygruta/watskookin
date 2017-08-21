@@ -1,0 +1,72 @@
+<html>
+<head><title>Print</title></head>
+<body>
+  <h1>Recipe: {{recipe.title}}</h1>
+  <h2>Recipe Image</h2>
+  <img src= {{recipe.imageUrl}} style="width:304px;height:228px;">
+
+  <h1>Recipe Details: </h1>
+  <h4>Source Url: {{recipe.detail.sourceUrl}}</h4>
+  <h4>Ready In Minutes: {{recipe.detail.readyInMinutes}} minutes</h4>
+  <h4>Servings: {{recipe.detail.servings}}</h4>
+  <h4>Price per Serving: ${{recipe.detail.pricePerServing}}</h4>
+  <h4>Number of saves by users: {{recipe.detail.saveCount}}</h4>
+
+  <h4>Cuisines: {% for c in recipe.cuisines %}
+                {{c.name}}
+                {% endfor %}
+  </h4>
+  <h4>Dish Type: {% for c in recipe.dishtypes %}
+                {{c.name}}
+                {% endfor %}
+  </h4>
+  <h4>Diet: {% for c in recipe.diets %}
+                {{c.name}}
+                {% endfor %}
+  </h4>
+
+  <h1>Ingredients:</h1>
+
+    {% for i in ingredient %}
+
+
+      <h4>Name: {{ i.name }}</h4>
+      <p>Amount: {{i.ingredientamounts.first().amount}} {{i.ingredientamounts.first().unit}}</p>
+      <p> {{ i.ingredientamounts.first().originalString }}</p>
+      <img src = {{ i.imageUrl }} style="width:50px;height:50px;">
+
+
+
+    {% endfor %}
+
+
+  <h1>Cooking Instructions:</h1>
+    {% for i in recipe.instructions.all() %}
+        <p>{{i.stepNumber}}. {{i.stepDescription}}</p>
+    {% endfor %}
+
+
+    <h1>Nutrition Information</h1>
+    <h4>Calories: {{recipe.nutritionfact.calories}}</h4>
+    <h4>Fat: {{recipe.nutritionfact.fat}}</h4>
+    <h4>Saturated Fat: {{recipe.nutritionfact.saturatedFat}}</h4>
+    <h4>Carbohydrates: {{recipe.nutritionfact.carbohydrates}}</h4>
+    <h4>Sugar: {{recipe.nutritionfact.sugar}}</h4>
+    <h4>Cholesterol: {{recipe.nutritionfact.cholesterol}}</h4>
+    <h4>Sodium: {{recipe.nutritionfact.sodium}}</h4>
+    <h4>Protein: {{recipe.nutritionfact.protein}}</h4>
+    <h4>Fiber: {{recipe.nutritionfact.fiber}}</h4>
+
+
+    <h1>Similar Recipes:</h1>
+    {% for i in recipe.similarrecipes.all() %}
+      <p>Recipe: {{ i.title }}</p>
+      <p>Recipe Image</p>
+      <form method = "POST" action="/recipeDetails">
+        <input type="image" src={{ i.imageUrl }} width="304" height="228" name ="recipeID" value={{ i.similarRecipe_id }} alt="Submit">
+      </form>
+    {% endfor %}
+
+
+</body>
+</html>

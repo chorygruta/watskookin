@@ -1,0 +1,19 @@
+<html>
+	<head><title>Recipes based on Ingredients</title></head>
+<body>
+  <h1>Recipes based on Ingredients: <i> {{ inputIngredients }}</i></h1>
+
+  {% for recipe in recipes %}
+  <h1>Recipe: {{recipe.title}}</h1>
+  <h2>Recipe Image</h2>
+
+  <form method = "POST" action="/recipeDetails">
+    <input type="image" src={{ recipe.imageUrl }} width="304" height="228" name ="recipeID" value={{ recipe.id }} alt="Submit">
+    <p>click image for more details about the recipe</p>
+  </form>
+
+  {% endfor %}
+
+</body>
+</body>
+</html>
