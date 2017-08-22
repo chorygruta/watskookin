@@ -3,7 +3,7 @@
 
 <head>
     <!-- Theme Made By www.w3schools.com - No Copyright -->
-    <title>WatsKookin | Recipes based on Ingredients</title>
+    <title>WatsKookin | Search</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -137,17 +137,29 @@
 
     <!-- First Container -->
     <div class="container-fluid bg-1 text-center" style = "margin-top:20px;">
+      <!--
+      <form method = "POST" action="/results">
+        <p><strong>Enter ingredients</strong></p>
+        <input type="text" name="ingredients" placeholder="use ',' to separate each ingredients" style ="width:300px;">
+        <br><br><input type ="submit" value = "Find Recipes">
+      </form>
+    -->
+      <br><br>
+      <div class="row centered">
+        <div>
+          <a href ='/search/by-ingredients-search'><div id="circle" class="col-xs-6" style ="background-image:url('/static/images/by-ingredients-background.jpg'); background-size: cover;
+  background-repeat: no-repeat;"></div></a>
+          <h3>By Ingredient</h3>
+        </div>
+      </div>
 
-			<h4>Recipes based on Ingredients: <i> {{ inputIngredients }}</i></h4>
-
-		  {% for recipe in recipes %}
-		  <h4>{{recipe.title}}</h4>
-			
-			  <form method = "POST" action="/recipeDetails">
-			    <input type="image" src={{ recipe.imageUrl }} width="304" height="228" name ="recipeID" value={{ recipe.id }} alt="Submit">
-			  </form>
-
-		  {% endfor %}
+      <div class="row centered">
+        <div>
+          <a href = '/search'><div id="circle" class="col-xs-6" style ="background-image:url('/static/images/by-recipe-background.jpg'); background-size: cover;
+  background-repeat: no-repeat;"></div></a>
+          <h3>By Recipe</h3>
+        </div>
+      </div>
 
     </div>
 

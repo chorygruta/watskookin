@@ -124,6 +124,11 @@ def recipeDetails():
 def search():
     return render_template('search.html')
 
+@app.route('/search/by-ingredients-search')
+@login_required
+def byIngredientSearch():
+    return render_template('byIngredientsSearch.html')
+
 @app.route('/')
 def index():
     return render_template('index.html')
