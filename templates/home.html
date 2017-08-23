@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block home %}
+<div class="container-fluid bg-1 text-center" style="margin-top:20px;">
+
+    <div class="row centered">
+        <div>
+            <a href='/search'>
+                <div id="circle" class="col-xs-6" style="background-image:url('/static/images/search-background.jpg'); background-size: cover; background-repeat: no-repeat;"></div>
+            </a>
+        <h3>Search Recipe</h3>
+      </div>
+    </div>
+
+    <div class="row centered">
+        <div>
+            <a href='/pantry'>
+              <div id="circle" class="col-xs-6" style="background-image:url('/static/images/pantry-background.jpg'); background-size: cover; background-repeat: no-repeat;"></div>
+            </a>
+            <h3>Pantry</h3>
+        </div>
+        <div>
+            <a href='/favorites'>
+                <div id="circle" class="col-xs-6" style="background-image:url('/static/images/favorites-background.jpg'); background-size: cover; background-repeat: no-repeat;"></div>
+            </a>
+            <h3>Favorites</h3>
+        </div>
+    </div>
+
+    <div class="row centered">
+        <div>
+            <a href='/catalog'>
+              <div id="circle" class="col-xs-6" style="background-image:url('/static/images/catalog-background.jpg'); background-size: cover; background-repeat: no-repeat;"></div>
+            </a>
+            <h3>Catalog</h3>
+        </div>
+        <div>
+          <a href='/history'>
+            <div id="circle" class="col-xs-6" style="background-image:url('/static/images/history-background.jpg'); background-size: cover; background-repeat: no-repeat;"></div>
+          </a>
+          <h3>History</h3>
+        </div>
+      </div>
+</div>
+{% endblock %}
