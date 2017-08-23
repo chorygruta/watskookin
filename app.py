@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 app.config.from_pyfile('config.py')
 
-#heroku = Heroku(app)
+heroku = Heroku(app)
 
 db = SQLAlchemy(app)
 
