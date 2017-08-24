@@ -1,17 +1,23 @@
 from flask import request, render_template, redirect,url_for, request
 from flask_wtf import FlaskForm
+from difflib import SequenceMatcher
 from app import app
 from models import *
 from forms import *
 
 ######################################################################################################################################################################################
+# calculates the similarity ratio of 2 strings returns a ratio number
+#@app.route('/test')
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
+
+
 #@app.route('/catalog/<category>', defaults={'results':''}, methods = ['POST','GET'])
 @app.route('/catalog/<category>',methods = ['POST','GET'])
 def getCategoryResults(category):
 
     if request.method != 'POST':
         return render_template('category_results.html', form=form)
-
 
 
 #returns a Recipe object
@@ -47,64 +53,81 @@ class searchRecipe(object):
     missedIngredient = 0
     usedIngredient = 0
 
+
+
 ######################################################################################################################################################################################
+#parses input ingredients and returns a list of recipes
+def parseIngredients(inputIngredients):
+    ingredientList = inputIngredients.replace(", ",",").split(",")
+    tempList = []
+
+    for i in ingredientList:
+        if i.endswith('es'):
+            tempList.append(i[:-2])
+        elif i.endswith('s'):
+            tempList.append(i[:-1])
+        else:
+            tempList.append(i)
+
+    ingredientList = tempList
+
+    likeIngredientList = ["%" + i + "%" for i in ingredientList]
+    finalIngredientList = []
+
+    counter = 0
+    for i in likeIngredientList:
+        similarIngredients = Ingredient.query.filter(Ingredient.name.like(i)).all()
+
+        for sis in similarIngredients:
+            si = sis.name
+            #return str(si) + " " + str(ingredientList[counter]) + " " + str(similar(si, ingredientList[counter]))
+            if similar(si, ingredientList[counter]) >= 0.90:
+                finalIngredientList.append(si)
+                print('90 ' + si )
+
+            elif len(si.split(" ")) == 1:
+                if similar(si,ingredientList[counter]) >= 0.80:
+                    finalIngredientList.append(si)
+                    print('80 ' + si )
+
+            elif len(si.split(" ")) == 2:
+                parsedString = si.split(" ")
+                if similar(parsedString[0], ingredientList[counter]) >= 0.80:
+                    finalIngredientList.append(si)
+                    print('80 2 words ' + si )
+                elif similar(parsedString[1], ingredientList[counter]) >= 0.80:
+                    finalIngredientList.append(si)
+                    print('80 2 words ' + si )
+                else:
+                    pass
+            else:
+                pass
+        counter += 1
+
+    return finalIngredientList
 
 @app.route('/results', methods=['POST'])
 @login_required
 def results():
-
-    #initializes input with the input values from the form ingredients
-    inputIngredients = request.form['ingredients']
-    #puts the input ingredients into a list
-    ingredient_list = inputIngredients.replace(", ",",").split(",")
-    like_list = ["%" + i + "%" for i in ingredient_list]
-    #searches for recipes that has the ingredients in ingredient_list and puts it inside recipes
-    recipes = Recipe.query.filter(Recipe.ingredients.any(Ingredient.name.in_(ingredient_list))).all()
-
     maximizedUsedRecipes = []
     minimizedMissedRecipes = []
-    search_list = []
 
-    for i in range(len(ingredient_list), 0, -1):
-        print('For match ' + str(i))
-        for r in recipes:
-            usedIngredient = 0
-            for ing in r.ingredients:
-                for s in ingredient_list:
-                    if s == ing.name:
-                        usedIngredient += 1
-            missedIngredient = len(r.ingredients) - usedIngredient
+    #initializes input with the input values from the form ingredients
+    inputIngredients = request.form['ingredients'].lower()
+    ingredientList = parseIngredients(inputIngredients)
+    recipes = Recipe.query.filter(Recipe.ingredients.any(Ingredient.name.in_(ingredientList))).all()
+    '''
+    counter = 0
+    for r in recipes:
+        recipeIngredientList = []
+        for i in Ingredient.query.filter(Ingredient.recipes.filter(Recipe.id == r.id)).all():
+            recipeIngredientList.append(i.name)
+            print (i.name)
+        return 'works'
 
-            sr = searchRecipe()
-            sr.recipe = r
-            sr.missedIngredient = missedIngredient
-            sr.usedIngredient = usedIngredient
-            search_list.append(sr)
+        if ingredientList[counter] in recipeIngredientList:
+            pass
             '''
-            if usedIngredient == i:
-                if r in maximizedUsedRecipes:
-                    pass
-                else:
-                    maximizedUsedRecipes.append(r)
-                    print (r.title + '  used: ' +  str(usedIngredient) + ' missed: ' + str(missedIngredient) + ' total: ' + str(len(r.ingredients)))
-
-            '''
-    for index in range(0 , len(ingredient_list)):
-        for i in search_list:
-            if i.missedIngredient == index:
-                if i.recipe not in minimizedMissedRecipes:
-                    minimizedMissedRecipes.append(i.recipe)
-            if i.usedIngredient == (len(ingredient_list)-index):
-                if i.recipe not in maximizedUsedRecipes:
-                    maximizedUsedRecipes.append(i.recipe)
-
-
-
-
-    #if no recipes found, return message
-    if len(recipes) == 0:
-        return '<h1>Ingredients do not exist in the database. <br> Please try again. </h1>'
-
     return render_template('results.html', recipes = recipes, inputIngredients=inputIngredients)
 
 
@@ -131,5 +154,4 @@ def byIngredientSearch():
 
 @app.route('/')
 def index():
-
     return render_template('home.html')

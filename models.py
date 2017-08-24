@@ -3,7 +3,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_user import login_required, UserManager, UserMixin, SQLAlchemyAdapter
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import Column, Integer, ForeignKey, exists, or_
-import flask_whooshalchemy as wa
+
 
 
 ingredients = db.Table('ingredients',
