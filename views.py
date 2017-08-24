@@ -57,19 +57,7 @@ class searchRecipe(object):
 
 ######################################################################################################################################################################################
 #parses input ingredients and returns a list of recipes
-def parseIngredients(inputIngredients):
-    ingredientList = inputIngredients.replace(", ",",").split(",")
-    tempList = []
-
-    for i in ingredientList:
-        if i.endswith('es'):
-            tempList.append(i[:-2])
-        elif i.endswith('s'):
-            tempList.append(i[:-1])
-        else:
-            tempList.append(i)
-
-    ingredientList = tempList
+def parseIngredients(ingredientList):
 
     likeIngredientList = ["%" + i + "%" for i in ingredientList]
     finalIngredientList = []
@@ -109,27 +97,72 @@ def parseIngredients(inputIngredients):
 @app.route('/results', methods=['POST'])
 @login_required
 def results():
-    maximizedUsedRecipes = []
-    minimizedMissedRecipes = []
 
     #initializes input with the input values from the form ingredients
     inputIngredients = request.form['ingredients'].lower()
-    ingredientList = parseIngredients(inputIngredients)
+    ingredientList = inputIngredients.replace(", ",",").split(",")
+    tempList = []
+
+    for i in ingredientList:
+        if i.endswith('es'):
+            tempList.append(i[:-2])
+        elif i.endswith('s'):
+            tempList.append(i[:-1])
+        else:
+            tempList.append(i)
+
+    ingredientList = tempList
+    inputIngredients = ingredientList
+
+    ingredientList = parseIngredients(ingredientList)
+
     recipes = Recipe.query.filter(Recipe.ingredients.any(Ingredient.name.in_(ingredientList))).all()
-    '''
-    counter = 0
+
+    rankedRecipesList = []
+
     for r in recipes:
         recipeIngredientList = []
-        for i in Ingredient.query.filter(Ingredient.recipes.filter(Recipe.id == r.id)).all():
+        matchedCounter = 0
+        missedCounter = 0
+
+        for i in Ingredient.query.filter(Ingredient.recipes.any(id = r.id)):
             recipeIngredientList.append(i.name)
-            print (i.name)
-        return 'works'
+            #print (i.name)
 
-        if ingredientList[counter] in recipeIngredientList:
-            pass
-            '''
+        for input in inputIngredients:
+            ifAdded = True
+            for ing in recipeIngredientList:
+                if ifAdded == True:
+                    if similar(input, ing) >= 0.80:
+                        matchedCounter += 1
+                        ifAdded = False
+
+                    elif len(ing.split(" ")) == 2:
+                        parsedString = ing.split(" ")
+                        if similar(parsedString[0], input) >= 0.80:
+                            matchedCounter +=1
+                            ifAdded = False
+
+                        elif similar(parsedString[1], input) >= 0.80:
+                            matchedCounter +=1
+                            ifAdded = False
+
+                        else:
+                            pass
+                    else:
+                        pass
+        missedCounter = len(recipeIngredientList) - matchedCounter
+        rankedRecipesObj = (r, matchedCounter, missedCounter)
+        rankedRecipesList.append(rankedRecipesObj)
+
+    rankedRecipesList.sort(reverse=True, key=lambda tup: tup[1])
+
+    temp = []
+    for i in range(0, len(rankedRecipesList)):
+        temp.append(rankedRecipesList[i][0])
+    recipes = temp
+
     return render_template('results.html', recipes = recipes, inputIngredients=inputIngredients)
-
 
 @app.route('/recipeDetails', methods=['POST'])
 @login_required
