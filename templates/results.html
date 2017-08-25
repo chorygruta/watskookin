@@ -1,156 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout.html" %} {% block results %}
 
-<head>
-    <!-- Theme Made By www.w3schools.com - No Copyright -->
-    <title>WatsKookin | Recipes based on Ingredients</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <style>
-        body {
-            font: 20px Montserrat, sans-serif;
-            line-height: 1.8;
-            color: #f5f6f7;
-            background:#1abc9c;
-        }
+<style>
+    h5 {
+        color: grey;
+        text-align: left;
+    }
 
-        p {
-            font-size: 16px;
-        }
+    h4 {
+        color: black;
+        text-align: left;
+    }
 
-        .margin {
-            margin-bottom: 45px;
-        }
+    body {
+        background: #fff;
+    }
 
-        .bg-1 {
-            background-color: #1abc9c;
-            /* Green */
-            color: #ffffff;
-        }
+    .navbar-brand {
+        font-size: 24px;
+        color: #fff;
+    }
 
-        .bg-2 {
-            background-color: #474e5d;
-            /* Dark Blue */
-            color: #ffffff;
-        }
+    .navbar {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border: 0;
+        border-radius: 0;
+        margin-bottom: 0;
+        font-size: 12px;
+        letter-spacing: 5px;
+        font-size: 18px;
+        background-color: #1abc9c;
+        color: #fff;
+    }
 
-        .bg-3 {
-            background-color: #ffffff;
-            /* White */
-            color: #555555;
-        }
+    form {
+        box-shadow: 0 0 2px 1px #f2f2f2;
+        border: solid 1px #e6e6e6;
+        display: block;
+        background-color: #fff;
+        width: auto;
+    }
 
-        .bg-4 {
-            background-color: #2f2f2f;
-            /* Black Gray */
-            color: #fff;
-        }
+    .form-wrapper {
+        width: 350px;
+        margin: 20px auto;
+    }
 
-        .container-fluid {
-            padding-top: 0px;
-            padding-bottom: 0px;
-        }
+    .text-center {
+        text-align: center;
+        padding: 10px;
+    }
+    .blk-font
+    {
+      color: black;
+    }
+    .pagination-page-info {
+    padding: .6em;
+    padding-left: 0;
+    width: 40em;
+    margin: .5em;
+    margin-left: 0;
+    font-size: 12px;
+}
+.pagination-page-info b {
+    color: black;
+    background: #6aa6ed;
+    padding-left: 2px;
+    padding: .1em .25em;
+    font-size: 150%;
+}
+</style>
+<div class="container-fluid" style="margin-top:20px;">
 
-        .navbar {
-            padding-top: 5px;
-            padding-bottom: 5px;
-            border: 0;
-            border-radius: 0;
-            margin-bottom: 0;
-            font-size: 12px;
-            letter-spacing: 5px;
-            font-size: 18px;
-        }
-
-        .navbar-brand {
-            font-size: 24px;
-        }
-
-        .navbar-brand:hover,
-        .navbar-brand a:hover {
-            font-size: 26px;
-            color: green;
-        }
-
-        .navbar-nav li a:hover {
-            color: #1abc9c !important;
-            font-size: 24px;
-        }
-
-        #circle {
-            width: 128px;
-            height: 128px;
-            border-radius: 64px;
-            border: 2px solid #fff;
-            margin-left: 20px;
-            margin-right: 20px;
-            margin-top:20px;
-
-        }
-
-        .row {
-          background:#1abc9c;
-        }
-
-        .centered {
-            text-align: center;
-            font-size: 0;
-        }
-
-        .centered>div {
-            float: none;
-            display: inline-block;
-            text-align: center;
-            font-size: 13px;
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-default">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-                <a class="navbar-brand" href="http://localhost:5000/">WatsKookin</a>
+    <h4>{{recipes|length}} recipe results including <i> {{inputIngredients}} </i></h4>
+    {% for recipe in recipes %}
+    <p></p>
+    <div class="form-wrapper">
+        <form class="text-center" method="POST" action="/recipeDetails">
+            <input type="image" src={{ recipe[0].imageUrl }} width="330px" height="auto" name="recipeID" value={{ recipe[0].id }} alt="Submit">
+            <h4>{{recipe[0].title}}</h4>
+            <h5>Soy-and-Ginger-Glazed Salmon with Udon Noodles is a main course that serves 4. It is brought to you by Food and Wine. </h5>
+            <h5>Matched:<span style ="color:#1abc9c;">{{recipe[1]}}</span> Missed: <span style ="color:red">{{recipe[2]}}</span></h5>
+            <p style="border-bottom: 2px solid #f2f2f2;"></p>
+            <h5>Recipe by <a href={{recipe[0].detail.recipeSourceUrl}}><span style ="color:black; text-weight:bold;">{{recipe[0].detail.recipeSourceName}}</span></a></h5>
+            <div style="color: black; font-size:16px; text-align:left;">
+              <span class="glyphicon glyphicon-cutlery" style="color:orange;"></span> {{recipe[0].detail.servings}} servings
+              <span class="glyphicon glyphicon-heart" style="color:red;"></span> {{recipe[0].detail.saveCount}} likes
+              <span class="glyphicon glyphicon-time" style="color:purple;"></span> {{recipe[0].detail.readyInMinutes}} min
             </div>
-            <div class="collapse navbar-collapse" id="myNavbar">
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href='/search'>Search</a></li>
-                    <li><a href='/catalog'>Catalog</a></li>
-                    <li><a href='/user/register'>Sign Up</a></li>
-                    <li><a href='/user/sign-in'>Sign In</a></li>
-                    <li><a href='/user/sign-out'>Sign Out</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- First Container -->
-    <div class="container-fluid bg-1 text-center" style = "margin-top:20px;">
-
-			<h4>Recipes based on Ingredients: <i> {{ inputIngredients }}</i></h4>
-
-		  {% for recipe in recipes %}
-		  <h4>{{recipe.title}}</h4>
-			
-			  <form method = "POST" action="/recipeDetails">
-			    <input type="image" src={{ recipe.imageUrl }} width="304" height="228" name ="recipeID" value={{ recipe.id }} alt="Submit">
-			  </form>
-
-		  {% endfor %}
-
+        </form>
     </div>
 
-</body>
+    {% endfor %}
 
-</html>
+</div>
+
+{% endblock %}

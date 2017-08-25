@@ -4,6 +4,7 @@ from difflib import SequenceMatcher
 from app import app
 from models import *
 from forms import *
+from flask_paginate import Pagination, get_page_parameter
 
 ######################################################################################################################################################################################
 # calculates the similarity ratio of 2 strings returns a ratio number
@@ -94,9 +95,17 @@ def parseIngredients(ingredientList):
 
     return finalIngredientList
 
-@app.route('/results', methods=['POST'])
+@app.route('/results', methods=['GET', 'POST'])
+@app.route('/results/<int:page>', methods=['GET', 'POST'])
 @login_required
 def results():
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+
 
     #initializes input with the input values from the form ingredients
     inputIngredients = request.form['ingredients'].lower()
@@ -160,9 +169,10 @@ def results():
     temp = []
     for i in range(0, len(rankedRecipesList)):
         temp.append(rankedRecipesList[i][0])
-    recipes = temp
+    recipes = rankedRecipesList
+    pagination = Pagination(page=page, total=len(recipes), search=search, record_name='recipes')
 
-    return render_template('results.html', recipes = recipes, inputIngredients=inputIngredients)
+    return render_template('results.html', recipes = recipes, inputIngredients=inputIngredients, pagination=pagination)
 
 @app.route('/recipeDetails', methods=['POST'])
 @login_required
@@ -187,4 +197,4 @@ def byIngredientSearch():
 
 @app.route('/')
 def index():
-    return render_template('home.html')
+    return render_template('index.html')
