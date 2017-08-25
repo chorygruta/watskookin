@@ -4,7 +4,6 @@ from difflib import SequenceMatcher
 from app import app
 from models import *
 from forms import *
-from flask_paginate import Pagination, get_page_parameter
 
 ######################################################################################################################################################################################
 # calculates the similarity ratio of 2 strings returns a ratio number
