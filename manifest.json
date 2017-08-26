@@ -8,17 +8,17 @@
       "sizes": "48x48"
     },
     {
-      "src": "launcher-icon-2x.png",
+      "src": "launcher-icon-2x.jpg",
       "type": "image/jpg",
       "sizes": "96x96"
     },
     {
-      "src": "launcher-icon-4x.png",
+      "src": "launcher-icon-4x.jpg",
       "type": "image/jpg",
       "sizes": "192x192"
     }
   ],
-  "start_url": "/?utm_source=homescreen",
+  "start_url": "http://localhost:5000/?launcher=true",
   "display": "standalone",
   "background_color": "#1abc9c",
   "theme_color": "#1abc9c"
