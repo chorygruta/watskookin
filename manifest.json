@@ -21,5 +21,10 @@
   "start_url": "/search?utm_source=homescreen",
   "display": "standalone",
   "background_color": "#1abc9c",
-  "theme_color": "#1abc9c"
+  "theme_color": "#1abc9c",
+  "related_applications": [{
+        "platform": "web"
+    }],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
