@@ -194,6 +194,6 @@ def search():
 def byIngredientSearch():
     return render_template('byIngredientsSearch.html')
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
