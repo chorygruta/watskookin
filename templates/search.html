@@ -6,7 +6,8 @@
 <style>
     body {
         margin: 0;
-        min-width: 250px;
+        min-width: 60.38vw;
+        font-size: 3.86vw
     }
     /* Include the padding and border in an element's total width and height */
 
@@ -24,14 +25,14 @@
     ul li {
         cursor: pointer;
         position: relative;
-        padding: 5px 35px 8px 8px;
+        padding: 1.2vw 8.45vw 1.9vw 1.9vw;
         background: #eee;
-        font-size: 20px;
+        font-size: 4.8vw;
         transition: 0.2s;
         width: auto;
-        margin: 2px;
+        margin: 0.48vw;
         display: inline-block;
-        border-radius: 6px;
+        border-radius: 1.45vw;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
@@ -49,16 +50,16 @@
         position: absolute;
         right: 0;
         top: 0;
-        padding: 6px 12px 6px 12px;
+        padding: 1.45vw 2.9vw 1.45vw 2.9vw;
     }
     /* Style the input */
 
     input {
         border: none;
         width: 60%;
-        padding: 10px;
+        padding: 2.4vw;
         float: left;
-        font-size: 16px;
+        font-size: 3.86vw;
         background-color: #eee;
         -webkit-transition: width 0.4s ease-in-out;
         transition: width 0.4s ease-in-out;
@@ -72,26 +73,26 @@
     /* Style the "Add" button */
 
     .pantryBtn {
-        margin-left: 10px;
-        padding: 10px;
+        margin-left: 2.4vw;
+        padding: 2.4vw;
         width: 22%;
         background: #1abc9c;
         color: #fff;
         float: left;
         text-align: center;
-        font-size: 16px;
+        font-size: 3.86vw;
         cursor: pointer;
         transition: 0.3s;
     }
 
     .addBtn {
-        padding: 10px;
+        padding: 2.4vw;
         width: 15%;
         background: #1abc9c;
         color: #fff;
         float: left;
         text-align: center;
-        font-size: 16px;
+        font-size: 3.86vw;
         cursor: pointer;
         transition: 0.3s;
         z-index: 2;
@@ -100,42 +101,46 @@
     .word-bank {
         overflow: auto;
         width: 90vw;
-        height: 200px;
-        margin: 10px auto;
-        padding: 5px;
-        border: 2px solid grey;
+        height: 27.17vh;
+        margin: 2.4vw auto;
+        padding: 1.2vw;
+        border: 0.4vw solid grey;
     }
 
     .pantry {
-        height: auto;
-        width: 0;
-        position: fixed;
-        z-index: 1;
-        top: 370px;
-        left: 0;
-        background-color: #1abc9c;
-        overflow-x: hidden;
-        transition: 0.5s;
-        text-align: center;
+      height: auto;
+      width: 0;
+      position: relative;
+      z-index: 1;
+      top: -10vw;
+      /* left: 0; */
+      background-color: #1abc9c;
+      overflow-x: hidden;
+      transition: 0.5s;
+      text-align: center;
+      /* margin-top: 10px; */
+      line-height: 100%;
     }
 
     .pantry .closebtn {
-        position: absolute;
-        top: 0;
-        right: 25px;
-        font-size: 36px;
-        margin-left: 50px;
+      position: relative;
+      top: 3vw;
+      right: 3vw;
+      font-size: 8.7vw;
+      /* margin-left: 1224vw; */
+      float: right;
+      color: white;
     }
 
     section img {
-        height: 85px;
-        width: 100px;
+        height: 11.5vh;
+        width: 24.15vw;
         display: block;
         margin: 0 auto;
     }
 
     section div {
-        margin-bottom: 10px;
+        margin-bottom: 2.4vw;
     }
 
     section {
@@ -145,27 +150,27 @@
 
     .slick-slide {
         float: left;
-        height: 119px;
-        width: 119px;
-        min-height: 1px;
-        border: 1px solid grey;
-        margin: 5px;
+        height: 16.1vh;
+        width: 28.74vw;
+        min-height: 0.1vh;
+        border: 0.1vh solid grey;
+        margin: 1.2vw;
         background-color: #fff;
     }
 
     #snackbar {
       visibility: hidden;
-      min-width: 250px;
-      margin: 10px auto;
+      min-width: 60.38vw;
+      margin: 2.4vw auto;
       background-color: #1abc9c;
       color: #fff;
       text-align: center;
-      border-radius: 2px;
-      padding: 16px;
+      border-radius: 0.48vw;
+      padding: 3.86vw;
       z-index: 1;
       position: relative;
-      top: -60px;
-      font-size: 17px;
+      top: -14.5vw;
+      font-size: 4.1vw;
     }
 
     #snackbar.show {
@@ -180,7 +185,7 @@
             opacity: 0;
         }
         to {
-            bottom: 30px;
+            bottom: 7.24vw;
             opacity: 1;
         }
     }
@@ -191,14 +196,14 @@
             opacity: 0;
         }
         to {
-            bottom: 30px;
+            bottom: 7.24vw;
             opacity: 1;
         }
     }
 
     @-webkit-keyframes fadeout {
         from {
-            bottom: 30px;
+            bottom: 7.24vw;
             opacity: 1;
         }
         to {
@@ -209,7 +214,7 @@
 
     @keyframes fadeout {
         from {
-            bottom: 30px;
+            bottom: 7.24vw;
             opacity: 1;
         }
         to {
@@ -226,7 +231,7 @@
 </div>
 
 <div class="container-fluid search-wrapper">
-    <div class="container-fluid" style="width:90%; margin:0 auto;">
+    <div class="container-fluid" style="width:90vw; margin:0 auto;">
         <input type="text" id="myInput" placeholder="Add Ingredients">
         <span onclick="newElement()" class="addBtn">Add</span>
         <span onclick="openNav()" class="pantryBtn">Pantry</span>
@@ -237,11 +242,11 @@
 
 <div id="myPantry" class="pantry">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <div style="height:40px; width:100%;">
+    <div style="height:5.4vh; width:100%;">
     </div>
     <section class="responsive">
         {% for i in ingredients %} {% set value = i.name %}
-        <div onclick="newElementFromPantry('{{ value }}')" style="height:129px; width:106px;">
+        <div onclick="newElementFromPantry('{{ value }}')" style="height:17.5vh; width:25.6vw;">
             <img src={{ i.imageUrl }}>
             <p>{{value}}</p>
         </div>
