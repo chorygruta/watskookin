@@ -53,6 +53,15 @@ class searchRecipe(object):
     missedIngredient = 0
     usedIngredient = 0
 
+def addIngredient(userObj, ingredientObj):
+    UserObj.savedIngredients.append(IngredientObj)
+    db.session.commit()
+
+def saveRecipe(userObj, recipeObj):
+    UserObj.savedRecipes.append(recipeObj)
+    db.session.commit()
+
+
 
 
 ######################################################################################################################################################################################
@@ -187,7 +196,8 @@ def recipeDetails():
 @app.route('/search')
 @login_required
 def search():
-    return render_template('search.html')
+    ingredients = Ingredient.query.all()
+    return render_template('search.html', ingredients = ingredients)
 
 @app.route('/search/by-ingredients-search')
 @login_required

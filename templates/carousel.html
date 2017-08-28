@@ -1,0 +1,60 @@
+<html>
+
+<head>
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+
+    <style>
+    section img{
+      height:85px;
+      margin:10px;
+    }
+    .slick-slide {
+      float: left;
+      height: 119px;
+      min-height: 1px;
+    }
+
+    </style>
+</head>
+
+<body>
+    <section class="responsive">
+        <div>
+            <img src="http://placehold.it/350x300?text=1">
+        </div>
+        <div>
+            <img src="http://placehold.it/350x300?text=1">
+        </div>
+        <div>
+            <img src="http://placehold.it/350x300?text=1">
+        </div>
+        <div>
+            <img src="http://placehold.it/350x300?text=1">
+        </div>
+        <div>
+            <img src="http://placehold.it/350x300?text=1">
+        </div>
+        <div>
+            <img src="http://placehold.it/350x300?text=1">
+        </div>
+
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css" rel="stylesheet" />
+    <script type="text/javascript">
+        $(document).on('ready', function() {
+            $('.responsive').slick({
+                dots: true,
+                infinite: true,
+                speed: 300,
+                slidesToShow: 4,
+                slidesToScroll: 4,
+            });
+        });
+    </script>
+</body>
+
+</html>

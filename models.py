@@ -11,6 +11,16 @@ ingredients = db.Table('ingredients',
         db.Column('ingredient_id',db.Integer,db.ForeignKey('ingredient.id'), primary_key=True)
 )
 
+savedIngredients = db.Table('myIngredients',
+        db.Column('user_id', db.Integer,db.ForeignKey('user.id'), primary_key=True),
+        db.Column('ingredient_id',db.Integer,db.ForeignKey('ingredient.id'), primary_key=True)
+)
+
+savedRecipes = db.Table('savedRecipes',
+        db.Column('user_id', db.Integer,db.ForeignKey('user.id'), primary_key=True),
+        db.Column('recipe_id',db.Integer,db.ForeignKey('recipe.id'), primary_key=True)
+)
+
 cuisines = db.Table('cuisines',
         db.Column('recipe_id', db.Integer,db.ForeignKey('recipe.id'), primary_key=True),
         db.Column('cuisine_id',db.Integer,db.ForeignKey('cuisine.id'), primary_key=True)
@@ -140,10 +150,16 @@ class ingredientAmount(db.Model):
     ingredient_id = db.Column(db.Integer, db.ForeignKey('ingredient.id'),nullable=False)
 
 class User(db.Model, UserMixin):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False, server_default='')
     active = db.Column(db.Boolean(), nullable=False, server_default='0')
+
+    savedIngredients = db.relationship('Ingredient', secondary=savedIngredients, lazy='subquery', backref=db.backref('users',lazy=True))
+    savedRecipes = db.relationship('Recipe', secondary=savedRecipes, lazy='subquery', backref=db.backref('users',lazy=True))
+
+
 
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Recipe, db.session))

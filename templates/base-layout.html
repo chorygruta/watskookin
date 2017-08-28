@@ -202,6 +202,9 @@
             z-index: 2;
             cursor: pointer;
         }
+        #dashboard {
+          display: none;
+        }
     </style>
 
 </head>
@@ -209,9 +212,9 @@
 <body>
 
     <div class="top-row text-center">
-        <div type="button" class="container-fluid logo" data-toggle="collapse" data-target="#dashboard"></div>
+        <div id = "logo-btn" class="container-fluid logo"></div>
     </div>
-    <div id = "dashboard" class="dashboard-wrapper container-fluid collapse in">
+    <div id="dashboard" class="dashboard-wrapper container-fluid">
         <div class="upper-dashboard">
             <div class="middle-row row centered">
                 <div class="col-xs-3">
@@ -285,6 +288,15 @@
 
 
 </body>
+    {% block search %}{% endblock %}
+
+<script>
+    $(document).ready(function() {
+        $("#logo-btn").click(function() {
+            $("#dashboard").slideToggle("normal");
+        });
+    });
+</script>
 
 <script>
     if ('serviceWorker' in navigator) {

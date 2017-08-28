@@ -1,23 +1,404 @@
-{% extends "layout.html" %}
-{% block search %}
-    <div class="container-fluid bg-1 text-center" style = "margin-top:20px;">
+{% extends "base-layout.html" %} {% block search %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css" rel="stylesheet" />
+<style>
+    body {
+        margin: 0;
+        min-width: 250px;
+    }
+    /* Include the padding and border in an element's total width and height */
 
-      <br><br>
-      <div class="row centered">
-        <div>
-          <a href ='/search/by-ingredients-search'><div id="circle" class="col-xs-6" style ="background-image:url('/static/images/by-ingredients-background.jpg'); background-size: cover;
-  background-repeat: no-repeat;"></div></a>
-          <h3>By Ingredient</h3>
-        </div>
-      </div>
+    * {
+        box-sizing: border-box;
+    }
+    /* Remove margins and padding from the list */
 
-      <div class="row centered">
-        <div>
-          <a href = '/search'><div id="circle" class="col-xs-6" style ="background-image:url('/static/images/by-recipe-background.jpg'); background-size: cover;
-  background-repeat: no-repeat;"></div></a>
-          <h3>By Recipe</h3>
-        </div>
-      </div>
+    ul {
+        margin: 0;
+        padding: 0;
+    }
+    /* Style the list items */
 
+    ul li {
+        cursor: pointer;
+        position: relative;
+        padding: 5px 35px 8px 8px;
+        background: #eee;
+        font-size: 20px;
+        transition: 0.2s;
+        width: auto;
+        margin: 2px;
+        display: inline-block;
+        border-radius: 6px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    /* Set all odd list items to a different color (zebra-stripes) */
+
+    ul li:nth-child(odd) {
+        background: #f9f9f9;
+    }
+    /* Add a "checked" mark when clicked on */
+    /* Style the close button */
+
+    .close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 6px 12px 6px 12px;
+    }
+    /* Style the input */
+
+    input {
+        border: none;
+        width: 60%;
+        padding: 10px;
+        float: left;
+        font-size: 16px;
+        background-color: #eee;
+        -webkit-transition: width 0.4s ease-in-out;
+        transition: width 0.4s ease-in-out;
+    }
+
+    .search-wrapper {
+        width: 100vw;
+        position: relative;
+        height: auto;
+    }
+    /* Style the "Add" button */
+
+    .pantryBtn {
+        margin-left: 10px;
+        padding: 10px;
+        width: 22%;
+        background: #1abc9c;
+        color: #fff;
+        float: left;
+        text-align: center;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .addBtn {
+        padding: 10px;
+        width: 15%;
+        background: #1abc9c;
+        color: #fff;
+        float: left;
+        text-align: center;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+        z-index: 2;
+    }
+
+    .word-bank {
+        overflow: auto;
+        width: 90vw;
+        height: 200px;
+        margin: 10px auto;
+        padding: 5px;
+        border: 2px solid grey;
+    }
+
+    .pantry {
+        height: auto;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 370px;
+        left: 0;
+        background-color: #1abc9c;
+        overflow-x: hidden;
+        transition: 0.5s;
+        text-align: center;
+    }
+
+    .pantry .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+    }
+
+    section img {
+        height: 85px;
+        width: 100px;
+        display: block;
+        margin: 0 auto;
+    }
+
+    section div {
+        margin-bottom: 10px;
+    }
+
+    section {
+        width: 84%;
+        margin: 0 auto;
+    }
+
+    .slick-slide {
+        float: left;
+        height: 119px;
+        width: 119px;
+        min-height: 1px;
+        border: 1px solid grey;
+        margin: 5px;
+        background-color: #fff;
+    }
+
+    #snackbar {
+      visibility: hidden;
+      min-width: 250px;
+      margin: 10px auto;
+      background-color: #1abc9c;
+      color: #fff;
+      text-align: center;
+      border-radius: 2px;
+      padding: 16px;
+      z-index: 1;
+      position: relative;
+      top: -60px;
+      font-size: 17px;
+    }
+
+    #snackbar.show {
+        visibility: visible;
+        -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @-webkit-keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @-webkit-keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+</style>
+
+<div id="ingredientBank" class="container-fluid word-bank">
+    <ul id="myUL">
+        <!--li ingredients go here-->
+    </ul>
+</div>
+
+<div class="container-fluid search-wrapper">
+    <div class="container-fluid" style="width:90%; margin:0 auto;">
+        <input type="text" id="myInput" placeholder="Add Ingredients">
+        <span onclick="newElement()" class="addBtn">Add</span>
+        <span onclick="openNav()" class="pantryBtn">Pantry</span>
     </div>
+</div>
+
+<div id="snackbar"></div>
+
+<div id="myPantry" class="pantry">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <div style="height:40px; width:100%;">
+    </div>
+    <section class="responsive">
+        {% for i in ingredients %} {% set value = i.name %}
+        <div onclick="newElementFromPantry('{{ value }}')" style="height:129px; width:106px;">
+            <img src={{ i.imageUrl }}>
+            <p>{{value}}</p>
+        </div>
+        {% endfor %}
+    </section>
+</div>
+
+<script type="text/javascript">
+    $(document).on('ready', function() {
+        $('.responsive').slick({
+            dots: false,
+            infinite: false,
+            speed: 300,
+            slidesToShow: 3,
+            slidesToScroll: 3,
+            autoplay: true,
+            autoplaySpeed: 9000
+        });
+    });
+
+    function openNav() {
+        document.getElementById("myPantry").style.width = "100%";
+    }
+
+    function closeNav() {
+        document.getElementById("myPantry").style.width = "0";
+    }
+
+    // Create a "close" button and append it to each list item
+    var myNodelist = document.getElementsByTagName("LI");
+    var i;
+    for (i = 0; i < myNodelist.length; i++) {
+        var span = document.createElement("SPAN");
+        var txt = document.createTextNode("\u00D7");
+        span.className = "close";
+        span.appendChild(txt);
+        myNodelist[i].appendChild(span);
+    }
+
+    // Click on a close button to hide the current list item
+    var close = document.getElementsByClassName("close");
+    var i;
+    for (i = 0; i < close.length; i++) {
+        close[i].onclick = function() {
+            var div = this.parentElement;
+            div.style.display = "none";
+        }
+    }
+
+    // Create a new list item when clicking on the "Add" button
+    function newElement() {
+        if (document.getElementById("myInput").value === '') {
+            var x = document.getElementById("snackbar")
+            x.innerHTML = "Please enter an ingredient";
+            x.className = "show";
+            setTimeout(function() {
+                x.className = x.className.replace("show", "");
+            }, 3000);
+        } else {
+
+            var check = true;
+            $('#myUL').find('li').each(function() {
+                var innerDivId = $(this).text();
+                innerDivId = innerDivId.slice(0, -1);
+
+                if (innerDivId.toLowerCase() === document.getElementById("myInput").value.toLowerCase())
+                    check = false;
+            });
+
+            if (check) {
+
+                var out = document.getElementById("ingredientBank");
+                var li = document.createElement("li");
+                var inputValue = document.getElementById("myInput").value;
+                var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
+                var t = document.createTextNode(inputValue);
+                li.appendChild(t);
+                document.getElementById("myUL").appendChild(li);
+
+                document.getElementById("myInput").value = "";
+
+                var span = document.createElement("SPAN");
+                var txt = document.createTextNode("\u00D7");
+                span.className = "close";
+                span.appendChild(txt);
+                li.appendChild(span);
+
+                if (isScrolledToBottom)
+                    out.scrollTop = out.scrollHeight - out.clientHeight;
+
+                for (i = 0; i < close.length; i++) {
+                    close[i].onclick = function() {
+                        var div = this.parentElement;
+                        div.style.display = "none";
+                    }
+                }
+            } else {
+                var x = document.getElementById("snackbar")
+                x.innerHTML = "'" + document.getElementById("myInput").value + "' has already been added";
+                x.className = "show";
+                setTimeout(function() {
+                    x.className = x.className.replace("show", "");
+                }, 3000);
+            }
+        }
+    }
+
+
+    function newElementFromPantry(name) {
+        var out = document.getElementById("ingredientBank");
+        var li = document.createElement("li");
+        var inputValue = name;
+
+        var check = true;
+        $('#myUL').find('li').each(function() {
+            var innerDivId = $(this).text();
+            innerDivId = innerDivId.slice(0, -1);
+            if (innerDivId.toLowerCase() === name.toLowerCase())
+                check = false;
+        });
+
+        if (check) {
+
+            var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
+
+            var t = document.createTextNode(inputValue);
+            li.appendChild(t);
+            if (inputValue === '') {
+                alert("No Ingredient Entered!");
+            } else {
+                document.getElementById("myUL").appendChild(li);
+            }
+            document.getElementById("myInput").value = "";
+
+            var span = document.createElement("SPAN");
+            var txt = document.createTextNode("\u00D7");
+            span.className = "close";
+            span.appendChild(txt);
+            li.appendChild(span);
+
+            if (isScrolledToBottom)
+                out.scrollTop = out.scrollHeight - out.clientHeight;
+
+            for (i = 0; i < close.length; i++) {
+                close[i].onclick = function() {
+                    var div = this.parentElement;
+                    div.style.display = "none";
+                }
+            }
+        } else {
+            var x = document.getElementById("snackbar")
+            x.innerHTML = "'" + name + "' has already been added";
+            x.className = "show";
+            setTimeout(function() {
+                x.className = x.className.replace("show", "");
+            }, 3000);
+        }
+    }
+</script>
 {% endblock %}
