@@ -34,6 +34,11 @@
 
     $(function() {
         var submit_form = function(e) {
+            var myNode = document.getElementById("recipeResults");
+            while (myNode.firstChild) {
+                myNode.removeChild(myNode.firstChild);
+            }
+            document.getElementById("loader").style.display = "block";
             $('#myIngredients').css('height', '0');
             var ingredientString = "";
             $('#myUL').find('li').each(function() {
@@ -41,12 +46,16 @@
             });
             ingredientString = ingredientString.slice(0, -2);
             document.getElementById("ingredientList").value = ingredientString;
+            var searchedIngredients = ingredientString;
 
             $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
                 a: $('input[name="a"]').val(),
             }, function(data) {
-                var i;
+                var c = $('#resultsCount').clone();
+                c.html(data.length + " recipe results including '" + searchedIngredients + "'");
+                c.appendTo("#recipeResults");
 
+                var i;
                 for (i = 0; i < data.length; i++) {
                     title = data[i].title;
                     imageUrl = data[i].imageUrl;
@@ -57,7 +66,8 @@
                     d.appendTo("#recipeResults");
 
                 }
-
+                document.getElementById("loader").style.display = "none";
+                document.getElementById("recipeResults").style.display = "block";
                 $('#result').text(text);
             });
             return false;
@@ -294,7 +304,7 @@
     }
 
     .results {
-        background: pink;
+        background: #1abc9c;
         height: auto;
         width: 100vw;
         margin-top: 1.35vh;
@@ -351,10 +361,10 @@
     }
 
     .resultContainer {
-      border: 0.23vw solid #dfe3e2;
-      background-color: #fff;
-      padding: 3.86vw;
-      margin: 0;
+        border: 0.23vw solid #dfe3e2;
+        background-color: #fff;
+        padding: 3.86vw;
+        margin: 0;
     }
 
     .resultContainer::after {
@@ -364,10 +374,10 @@
     }
 
     .resultContainer img {
-      float: left;
-      margin-right: 4.8vw;
-      width: 38.64vw;
-      height: 25.6vw;
+        float: left;
+        margin-right: 4.8vw;
+        width: 38.64vw;
+        height: 25.6vw;
     }
 
     .resultContainer span {
@@ -379,6 +389,78 @@
         .resultContainer {
             text-align: center;
         }
+    }
+
+    #loader {
+        position: absolute;
+        display: none;
+        left: 55%;
+        top: 75%;
+        z-index: 1;
+        width: 150px;
+        height: 150px;
+        margin: -75px 0 0 -75px;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #1abc9c;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    /* Add animation to "page content" */
+
+    .results {
+        position: relative;
+        -webkit-animation-name: results;
+        -webkit-animation-duration: 1s;
+        animation-name: results;
+        animation-duration: 1s
+    }
+
+    @-webkit-keyframes results {
+        from {
+            bottom: -100px;
+            opacity: 0
+        }
+        to {
+            bottom: 0px;
+            opacity: 1
+        }
+    }
+
+    @keyframes results {
+        from {
+            bottom: -100px;
+            opacity: 0
+        }
+        to {
+            bottom: 0;
+            opacity: 1
+        }
+    }
+
+    #recipeResults {
+        display: none;
+        text-align: center;
     }
 </style>
 
@@ -415,13 +497,15 @@
             {% endfor %}
         </div>
     </div>
-</div>
 
-<div id = "recipeResults" class="results">
+    <div id="loader" style="top:75%;"></div>
+    <div id="recipeDiv"></div>
+    <div id="resultsCount" style = "color:#fff;"></div>
     <input id="ingredientList" type="hidden" size="1000" name="a">
-    <div id = "recipeDiv"></div>
-</div>
 
+    <div id="recipeResults" class="results">
+    </div>
+</div>
 
 
 {% endblock %}
