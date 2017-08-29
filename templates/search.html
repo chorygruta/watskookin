@@ -72,13 +72,149 @@
             });
             return false;
         };
-        $('a#calculate').bind('click', submit_form);
+        $('button#searchB').bind('click', submit_form);
         $('input[type=text]').bind('keydown', function(e) {
             if (e.keyCode == 13) {
                 submit_form(e);
             }
         });
     });
+    var close = document.getElementsByClassName("close");
+    var i;
+    for (i = 0; i < close.length; i++) {
+        close[i].onclick = function() {
+            var div = this.parentElement;
+            //div.style.display = "none";
+            var parent = document.getElementById("myUL");
+            parent.removeChild(div);
+        }
+    }
+
+    // Create a new list item when clicking on the "Add" button
+    function newElement() {
+        if (document.getElementById("myInput").value === '') {
+            var x = document.getElementById("snackbar")
+            x.innerHTML = "Please enter an ingredient";
+            x.className = "show";
+            setTimeout(function() {
+                x.className = x.className.replace("show", "");
+            }, 3000);
+        } else {
+            document.getElementById("searchB").disabled = false;
+            $('#searchB').css('background', '#1abc9c');
+            var check = true;
+            $('#myUL').find('li').each(function() {
+                var innerDivId = $(this).text();
+                innerDivId = innerDivId.slice(0, -1);
+
+                if (innerDivId.toLowerCase() === document.getElementById("myInput").value.toLowerCase())
+                    check = false;
+            });
+
+            if (check) {
+
+                var out = document.getElementById("ingredientBank");
+                var li = document.createElement("li");
+                var inputValue = document.getElementById("myInput").value;
+                var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
+                var t = document.createTextNode(inputValue);
+                li.appendChild(t);
+                document.getElementById("myUL").appendChild(li);
+
+                document.getElementById("myInput").value = "";
+
+                var span = document.createElement("SPAN");
+                var txt = document.createTextNode("\u00D7");
+                span.className = "close";
+                span.appendChild(txt);
+                li.appendChild(span);
+
+                if (isScrolledToBottom)
+                    out.scrollTop = out.scrollHeight - out.clientHeight;
+
+                for (i = 0; i < close.length; i++) {
+                    close[i].onclick = function() {
+                        var div = this.parentElement;
+                        var parent = document.getElementById("myUL");
+                        parent.removeChild(div);
+
+                        var bank = $('#myUL');
+                        if (bank.children().length < 1) {
+                            document.getElementById("searchB").disabled = true;
+                            $('#searchB').css('background', '#b2b2b2');
+                        }
+                    }
+                }
+            } else {
+                var x = document.getElementById("snackbar")
+                x.innerHTML = "'" + document.getElementById("myInput").value + "' has already been added";
+                x.className = "show";
+                setTimeout(function() {
+                    x.className = x.className.replace("show", "");
+                }, 3000);
+            }
+        }
+    }
+
+
+    function newElementFromPantry(name) {
+        var out = document.getElementById("ingredientBank");
+        var li = document.createElement("li");
+        var inputValue = name;
+
+        var check = true;
+        $('#myUL').find('li').each(function() {
+            var innerDivId = $(this).text();
+            innerDivId = innerDivId.slice(0, -1);
+            if (innerDivId.toLowerCase() === name.toLowerCase())
+                check = false;
+        });
+
+        if (check) {
+            document.getElementById("searchB").disabled = false;
+            $('#searchB').css('background', '#1abc9c');
+            var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
+
+            var t = document.createTextNode(inputValue);
+            li.appendChild(t);
+            if (inputValue === '') {
+                alert("No Ingredient Entered!");
+            } else {
+                document.getElementById("myUL").appendChild(li);
+            }
+            document.getElementById("myInput").value = "";
+
+            var span = document.createElement("SPAN");
+            var txt = document.createTextNode("\u00D7");
+            span.className = "close";
+            span.appendChild(txt);
+            li.appendChild(span);
+
+            if (isScrolledToBottom)
+                out.scrollTop = out.scrollHeight - out.clientHeight;
+
+            for (i = 0; i < close.length; i++) {
+                close[i].onclick = function() {
+                    var div = this.parentElement;
+                    var parent = document.getElementById("myUL");
+                    parent.removeChild(div);
+
+                    var bank = $('#myUL');
+                    if (bank.children().length < 1) {
+                        document.getElementById("searchB").disabled = true;
+                        $('#searchB').css('background', '#b2b2b2');
+                    }
+                }
+            }
+        } else {
+            var x = document.getElementById("snackbar")
+            x.innerHTML = "'" + name + "' has already been added";
+            x.className = "show";
+            setTimeout(function() {
+                x.className = x.className.replace("show", "");
+            }, 3000);
+        }
+    }
 </script>
 
 <style>
@@ -141,6 +277,15 @@
         background-color: #eee;
         -webkit-transition: width 0.4s ease-in-out;
         transition: width 0.4s ease-in-out;
+        border-bottom-left-radius: 5px;
+        border-top-left-radius: 5px;
+    }
+
+    .btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
     }
 
     .search-wrapper {
@@ -181,6 +326,7 @@
         margin: 2.4vw auto;
         padding: 1.2vw;
         border: 0.4vw solid grey;
+        border-radius: 5px;
     }
 
     .pantry {
@@ -275,9 +421,19 @@
         }
     }
 
+    .btn-group,
+    .btn-group-vertical {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        height: 42px;
+        width: 111px;
+        top: -1px;
+    }
+
     .plusBtn {
         padding: 2.4vw;
-        width: 15%;
+        width: 50%;
         height: 100%;
         background: #1abc9c;
         color: #fff;
@@ -291,7 +447,7 @@
 
     .minusBtn {
         padding: 2.4vw;
-        width: 15%;
+        width: 50%;
         height: 100%;
         background: #ff7f7f;
         color: #fff;
@@ -392,21 +548,18 @@
     }
 
     #loader {
-        position: absolute;
-        display: none;
-        left: 55%;
-        top: 75%;
-        z-index: 1;
-        width: 150px;
-        height: 150px;
-        margin: -75px 0 0 -75px;
-        border: 16px solid #f3f3f3;
-        border-radius: 50%;
-        border-top: 16px solid #1abc9c;
-        width: 120px;
-        height: 120px;
-        -webkit-animation: spin 2s linear infinite;
-        animation: spin 2s linear infinite;
+      position: relative;
+      display: none;
+      z-index: 1;
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #1abc9c;
+      width: 120px;
+      height: 120px;
+      -webkit-animation: spin 2s linear infinite;
+      animation: spin 2s linear infinite;
+      top: 5vh;
+      margin: 0 auto;
     }
 
     @-webkit-keyframes spin {
@@ -462,6 +615,12 @@
         display: none;
         text-align: center;
     }
+
+    .btn {
+        color: #fff;
+        font-weight: bold;
+        text-decoration: none;
+    }
 </style>
 
 <div id="body-wrapper">
@@ -473,16 +632,21 @@
 
     <div class="container-fluid search-wrapper">
         <div class="container-fluid" style="width:90vw; margin:0 auto;">
-            <input type="text" id="myInput" placeholder="Add Ingredients">
-            <span class="plusBtn glyphicon glyphicon-plus" onclick="newElement()"></span>
-            <span class="minusBtn glyphicon glyphicon-minus" onclick="newElement()"></span>
+            <input type="text" id="myInput" placeholder="Include/exclude ingredients">
+
+            <div class="btn-group">
+                <button type="button" class="btn plusBtn glyphicon glyphicon-plus" onclick="newElement()"></button>
+                <button type="button" class="btn minusBtn glyphicon glyphicon-minus" onclick="newElement()"></button>
+            </div>
+
+
         </div>
     </div>
 
     <div class="container-fluid search-wrapper" style="margin-top:2.4vw;">
         <div class="container-fluid" style="width:90vw; margin:0 auto;">
-            <span onclick="openNav()" class="pantryBtn">Pantry</span>
-            <span type="button" onclick="" class="searchBtn"><a href=# id="calculate" style = "color:#fff;">Search</a></span>
+            <button onclick="openNav()" class="btn pantryBtn">Pantry</button>
+            <button type="button" id="searchB" disabled class="btn searchBtn">Search</button>
         </div>
     </div>
     <div id="snackbar"></div>
@@ -498,9 +662,12 @@
         </div>
     </div>
 
-    <div id="loader" style="top:75%;"></div>
+
     <div id="recipeDiv"></div>
-    <div id="resultsCount" style = "color:#fff;"></div>
+    <div id="resultsCount" style="color:#fff;"></div>
+
+    <div id="loader"></div>
+    <input id="excludedingredientList" type="hidden" size="1000" name="b">
     <input id="ingredientList" type="hidden" size="1000" name="a">
 
     <div id="recipeResults" class="results">

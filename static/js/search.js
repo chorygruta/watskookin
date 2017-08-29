@@ -1,33 +1,4 @@
-$(function() {
-    var submit_form = function(e) {
-        $('#myIngredients').css('height', '0');
-        var ingredientString = "";
-        $('#myUL').find('li').each(function() {
-            ingredientString += $(this).text().slice(0, -1) + ', ';
-        });
-        ingredientString = ingredientString.slice(0, -2);
-        document.getElementById("ingredientList").value = ingredientString;
 
-        $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
-            a: $('input[name="a"]').val(),
-        }, function(data) {
-            var text = "";
-            var i;
-            for (i = 0; i < data.result.length; i++) {
-                text += data.result[i] + ", ";
-            }
-
-            $('#result').text(text);
-        });
-        return false;
-    };
-    $('a#calculate').bind('click', submit_form);
-    $('input[type=text]').bind('keydown', function(e) {
-        if (e.keyCode == 13) {
-            submit_form(e);
-        }
-    });
-});
 
 function openNav() {
     document.getElementById("ingredientCarousel").style.width = "100%";
@@ -58,6 +29,10 @@ for (i = 0; i < close.length; i++) {
         var parent = document.getElementById("myUL");
         parent.removeChild(div);
     }
+    var list = document.getElementById("myUL").hasChildNodes();
+    if(list === false){
+        document.getElementById("searchB").disabled = true;
+    }
 }
 
 // Create a new list item when clicking on the "Add" button
@@ -70,7 +45,7 @@ function newElement() {
             x.className = x.className.replace("show", "");
         }, 3000);
     } else {
-
+        document.getElementById("searchB").disabled = false;
         var check = true;
         $('#myUL').find('li').each(function() {
             var innerDivId = $(this).text();
@@ -135,7 +110,7 @@ function newElementFromPantry(name) {
     });
 
     if (check) {
-
+         document.getElementById("searchB").disabled = false;
         var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
 
         var t = document.createTextNode(inputValue);
