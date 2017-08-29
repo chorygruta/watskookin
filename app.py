@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
-from flask.ext.heroku import Heroku
+from flask_marshmallow import Marshmallow
+from flask_heroku import Heroku
 from flask_admin import Admin
 import json
 import sys
@@ -15,9 +16,12 @@ heroku = Heroku(app)
 
 db = SQLAlchemy(app)
 
+ma = Marshmallow(app)
+
 admin = Admin(app)
 
 from views import *
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,9 +1,10 @@
-from flask import request, render_template, redirect,url_for, request
+from flask import request, render_template, redirect,url_for, request, jsonify
 from flask_wtf import FlaskForm
 from difflib import SequenceMatcher
 from app import app
 from models import *
 from forms import *
+import simplejson as json
 
 ######################################################################################################################################################################################
 # calculates the similarity ratio of 2 strings returns a ratio number
@@ -178,7 +179,6 @@ def results():
     for i in range(0, len(rankedRecipesList)):
         temp.append(rankedRecipesList[i][0])
     recipes = rankedRecipesList
-    pagination = Pagination(page=page, total=len(recipes), search=search, record_name='recipes')
 
     return render_template('results.html', recipes = recipes, inputIngredients=inputIngredients, pagination=pagination)
 
@@ -198,6 +198,100 @@ def recipeDetails():
 def search():
     ingredients = Ingredient.query.all()
     return render_template('search.html', ingredients = ingredients)
+
+@app.route('/_add_numbers')
+def add_numbers():
+    a = request.args.get('a', 0, type=str)
+    inputIngredients = a.lower()
+    ingredientList = inputIngredients.replace(", ",",").split(",")
+    tempList = []
+
+    for i in ingredientList:
+        if i.endswith('es'):
+            tempList.append(i[:-2])
+        elif i.endswith('s'):
+            tempList.append(i[:-1])
+        else:
+            tempList.append(i)
+
+    ingredientList = tempList
+    inputIngredients = ingredientList
+
+    ingredientList = parseIngredients(ingredientList)
+
+    recipes = Recipe.query.filter(Recipe.ingredients.any(Ingredient.name.in_(ingredientList))).all()
+
+    rankedRecipesList = []
+
+    for r in recipes:
+        recipeIngredientList = []
+        matchedCounter = 0
+        missedCounter = 0
+
+        for i in Ingredient.query.filter(Ingredient.recipes.any(id = r.id)):
+            recipeIngredientList.append(i.name)
+            #print (i.name)
+
+        for input in inputIngredients:
+            ifAdded = True
+            for ing in recipeIngredientList:
+                if ifAdded == True:
+                    if similar(input, ing) >= 0.80:
+                        matchedCounter += 1
+                        ifAdded = False
+
+                    elif len(ing.split(" ")) == 2:
+                        parsedString = ing.split(" ")
+                        if similar(parsedString[0], input) >= 0.80:
+                            matchedCounter +=1
+                            ifAdded = False
+
+                        elif similar(parsedString[1], input) >= 0.80:
+                            matchedCounter +=1
+                            ifAdded = False
+
+                        else:
+                            pass
+                    else:
+                        pass
+        missedCounter = len(recipeIngredientList) - matchedCounter
+        rankedRecipesObj = (r, matchedCounter, missedCounter)
+        rankedRecipesList.append(rankedRecipesObj)
+
+    rankedRecipesList.sort(reverse=True, key=lambda tup: tup[1])
+
+    temp = []
+    for i in range(0, len(rankedRecipesList)):
+        temp.append(rankedRecipesList[i][0])
+    recipes = rankedRecipesList
+
+
+    #result = json.dumps(r.__dict__)
+    return jsonify(temp)
+    # jsonify(result=ingredientList, recipes=result)
+
+@app.route('/process', methods=['POST'])
+def process():
+    #initializes input with the input values from the form ingredients
+    inputIngredients = request.form['ingredient'].lower()
+    ingredientList = inputIngredients.replace(", ",",").split(",")
+    tempList = []
+
+    for i in ingredientList:
+        if i.endswith('es'):
+            tempList.append(i[:-2])
+        elif i.endswith('s'):
+            tempList.append(i[:-1])
+        else:
+            tempList.append(i)
+
+    ingredientList = tempList
+    inputIngredients = ingredientList
+
+    ingredientList = parseIngredients(ingredientList)
+
+    return ingredientList
+
 
 @app.route('/search/by-ingredients-search')
 @login_required

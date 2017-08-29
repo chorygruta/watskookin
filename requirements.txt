@@ -10,6 +10,8 @@ Flask-Admin==1.5.0
 flask-heroku==0.1.9
 Flask-Login==0.4.0
 Flask-Mail==0.9.1
+flask-marshmallow==0.8.0
+flask-paginate==0.5.0
 Flask-SocketIO==0.6.0
 Flask-SQLAlchemy==2.2
 Flask-User==0.6.11
@@ -26,6 +28,8 @@ itsdangerous==0.24
 Jinja2==2.9.6
 lmdb==0.93
 MarkupSafe==1.0
+marshmallow==2.13.6
+marshmallow-sqlalchemy==0.13.1
 numpy==1.13.1
 passlib==1.7.1
 pipreqs==0.4.9
@@ -35,8 +39,9 @@ pycryptodome==3.4.6
 pydot2==1.0.33
 pyparsing==2.2.0
 requests==2.18.3
+simplejson==3.11.1
 six==1.10.0
-SQLAlchemy==1.1.12
+SQLAlchemy==1.1.13
 urllib3==1.22
 virtualenv==15.1.0
 Werkzeug==0.12.2

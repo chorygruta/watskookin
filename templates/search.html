@@ -1,13 +1,81 @@
 {% extends "base-layout.html" %} {% block search %}
+<!--<link rel="stylesheet" type="text/css" href="/static/css/search.css">-->
+<script src="/static/js/search.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css" rel="stylesheet" />
+<script>
+    $(document).on('ready', function() {
+        $(".single-item").slick({
+            slidesToShow: 3,
+            slidesToScroll: 3
+        });
+    });
+
+    function openNav() {
+        $('#myIngredients').css('height', '36.23vw');
+    }
+
+    function closeNav() {
+        $('#myIngredients').css('height', '0');
+    }
+    // Click on a close button to hide the current list item
+    var close = document.getElementsByClassName("close");
+    var i;
+    for (i = 0; i < close.length; i++) {
+        close[i].onclick = function() {
+            var div = this.parentElement;
+            //div.style.display = "none";
+            var parent = document.getElementById("myUL");
+            parent.removeChild(div);
+        }
+    }
+
+    $(function() {
+        var submit_form = function(e) {
+            $('#myIngredients').css('height', '0');
+            var ingredientString = "";
+            $('#myUL').find('li').each(function() {
+                ingredientString += $(this).text().slice(0, -1) + ', ';
+            });
+            ingredientString = ingredientString.slice(0, -2);
+            document.getElementById("ingredientList").value = ingredientString;
+
+            $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
+                a: $('input[name="a"]').val(),
+            }, function(data) {
+                var i;
+
+                for (i = 0; i < data.length; i++) {
+                    title = data[i].title;
+                    imageUrl = data[i].imageUrl;
+
+                    var d = $('#recipeDiv').clone();
+                    d.html("<div class='resultContainer'><img src=" + imageUrl + " class='img-thumbnail'><p><span>" + title + "</span></p></div>");
+                    //document.getElementsByClassName("resultContainer img").src= imageUrl;
+                    d.appendTo("#recipeResults");
+
+                }
+
+                $('#result').text(text);
+            });
+            return false;
+        };
+        $('a#calculate').bind('click', submit_form);
+        $('input[type=text]').bind('keydown', function(e) {
+            if (e.keyCode == 13) {
+                submit_form(e);
+            }
+        });
+    });
+</script>
+
 <style>
     body {
         margin: 0;
         min-width: 60.38vw;
-        font-size: 3.86vw
+        font-size: 3.86vw;
     }
     /* Include the padding and border in an element's total width and height */
 
@@ -56,7 +124,7 @@
 
     input {
         border: none;
-        width: 60%;
+        width: 70%;
         padding: 2.4vw;
         float: left;
         font-size: 3.86vw;
@@ -73,9 +141,8 @@
     /* Style the "Add" button */
 
     .pantryBtn {
-        margin-left: 2.4vw;
         padding: 2.4vw;
-        width: 22%;
+        width: 48.5%;
         background: #1abc9c;
         color: #fff;
         float: left;
@@ -85,17 +152,16 @@
         transition: 0.3s;
     }
 
-    .addBtn {
+    .searchBtn {
         padding: 2.4vw;
-        width: 15%;
-        background: #1abc9c;
+        width: 48.5%;
+        background: #b2b2b2;
         color: #fff;
-        float: left;
+        float: right;
         text-align: center;
         font-size: 3.86vw;
         cursor: pointer;
         transition: 0.3s;
-        z-index: 2;
     }
 
     .word-bank {
@@ -108,69 +174,45 @@
     }
 
     .pantry {
-      height: auto;
-      width: 0;
-      position: relative;
-      z-index: 1;
-      top: -10vw;
-      /* left: 0; */
-      background-color: #1abc9c;
-      overflow-x: hidden;
-      transition: 0.5s;
-      text-align: center;
-      /* margin-top: 10px; */
-      line-height: 100%;
+        height: 25.81vh;
+        width: 0%;
+        position: absolute;
+        z-index: 1;
+        margin: 1.35vh auto;
+        background-color: #1abc9c;
+        overflow-y: hidden;
+        transition: 0.5s;
+        text-align: center;
+        line-height: 100%;
     }
 
-    .pantry .closebtn {
-      position: relative;
-      top: 3vw;
-      right: 3vw;
-      font-size: 8.7vw;
-      /* margin-left: 1224vw; */
-      float: right;
-      color: white;
-    }
-
-    section img {
-        height: 11.5vh;
-        width: 24.15vw;
-        display: block;
-        margin: 0 auto;
-    }
-
-    section div {
-        margin-bottom: 2.4vw;
-    }
-
-    section {
-        width: 84%;
-        margin: 0 auto;
-    }
-
-    .slick-slide {
-        float: left;
-        height: 16.1vh;
-        width: 28.74vw;
-        min-height: 0.1vh;
-        border: 0.1vh solid grey;
-        margin: 1.2vw;
-        background-color: #fff;
+    .ingredientCarousel .closebtn {
+        position: relative;
+        top: 0vw;
+        right: -4vw;
+        font-size: 8.7vw;
+        float: right;
+        color: white;
     }
 
     #snackbar {
-      visibility: hidden;
-      min-width: 60.38vw;
-      margin: 2.4vw auto;
-      background-color: #1abc9c;
-      color: #fff;
-      text-align: center;
-      border-radius: 0.48vw;
-      padding: 3.86vw;
-      z-index: 1;
-      position: relative;
-      top: -14.5vw;
-      font-size: 4.1vw;
+        visibility: hidden;
+        background-color: #1abc9c;
+        color: #fff;
+        padding: 1.86vw;
+        z-index: 99 !important;
+        position: absolute;
+        top: 20vh;
+        width: 100%;
+        max-width: 960px;
+        /* min-width: 600px; */
+        height: auto;
+        max-height: 14.49vw;
+        overflow: hidden;
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+        text-align: center;
     }
 
     #snackbar.show {
@@ -222,188 +264,164 @@
             opacity: 0;
         }
     }
+
+    .plusBtn {
+        padding: 2.4vw;
+        width: 15%;
+        height: 100%;
+        background: #1abc9c;
+        color: #fff;
+        float: left;
+        text-align: center;
+        font-size: 5.3vw;
+        cursor: pointer;
+        transition: 0.3s;
+        z-index: 2;
+    }
+
+    .minusBtn {
+        padding: 2.4vw;
+        width: 15%;
+        height: 100%;
+        background: #ff7f7f;
+        color: #fff;
+        float: left;
+        text-align: center;
+        font-size: 5.3vw;
+        cursor: pointer;
+        transition: 0.3s;
+        z-index: 2;
+    }
+
+    .results {
+        background: pink;
+        height: auto;
+        width: 100vw;
+        margin-top: 1.35vh;
+    }
+
+    .ingredientCarousel {
+        margin: 2.4vw auto;
+        width: 100%;
+        color: black;
+        background-color: #1abc9c;
+        overflow-x: hidden;
+        transition: 0.5s;
+        text-align: center;
+        display: block;
+        padding-left: 7.2vw;
+        padding-right: 7.2vw;
+        height: 0;
+    }
+
+    .slick-slide {
+        text-align: center;
+        color: #419be0;
+        background: #fff;
+        margin: 1.2vw;
+    }
+
+    .slider {
+        display: none;
+    }
+
+    .slider.slick-initialized {
+        display: block;
+    }
+
+    .carouselHeader {
+        margin: 12vw auto;
+        font-size: 4.8vw;
+        font-weight: bold;
+        color: #fff;
+    }
+
+    .overlay {
+        position: fixed;
+        display: block;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        cursor: pointer;
+    }
+
+    .resultContainer {
+      border: 0.23vw solid #dfe3e2;
+      background-color: #fff;
+      padding: 3.86vw;
+      margin: 0;
+    }
+
+    .resultContainer::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    .resultContainer img {
+      float: left;
+      margin-right: 4.8vw;
+      width: 38.64vw;
+      height: 25.6vw;
+    }
+
+    .resultContainer span {
+        font-size: 4.83vw;
+        margin-right: 3.62vw;
+    }
+
+    @media (max-width: 500px) {
+        .resultContainer {
+            text-align: center;
+        }
+    }
 </style>
 
-<div id="ingredientBank" class="container-fluid word-bank">
-    <ul id="myUL">
-        <!--li ingredients go here-->
-    </ul>
-</div>
-
-<div class="container-fluid search-wrapper">
-    <div class="container-fluid" style="width:90vw; margin:0 auto;">
-        <input type="text" id="myInput" placeholder="Add Ingredients">
-        <span onclick="newElement()" class="addBtn">Add</span>
-        <span onclick="openNav()" class="pantryBtn">Pantry</span>
+<div id="body-wrapper">
+    <div id="ingredientBank" class="container-fluid word-bank">
+        <ul id="myUL">
+            <!--li ingredients go here-->
+        </ul>
     </div>
-</div>
 
-<div id="snackbar"></div>
-
-<div id="myPantry" class="pantry">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <div style="height:5.4vh; width:100%;">
-    </div>
-    <section class="responsive">
-        {% for i in ingredients %} {% set value = i.name %}
-        <div onclick="newElementFromPantry('{{ value }}')" style="height:17.5vh; width:25.6vw;">
-            <img src={{ i.imageUrl }}>
-            <p>{{value}}</p>
+    <div class="container-fluid search-wrapper">
+        <div class="container-fluid" style="width:90vw; margin:0 auto;">
+            <input type="text" id="myInput" placeholder="Add Ingredients">
+            <span class="plusBtn glyphicon glyphicon-plus" onclick="newElement()"></span>
+            <span class="minusBtn glyphicon glyphicon-minus" onclick="newElement()"></span>
         </div>
-        {% endfor %}
-    </section>
+    </div>
+
+    <div class="container-fluid search-wrapper" style="margin-top:2.4vw;">
+        <div class="container-fluid" style="width:90vw; margin:0 auto;">
+            <span onclick="openNav()" class="pantryBtn">Pantry</span>
+            <span type="button" onclick="" class="searchBtn"><a href=# id="calculate" style = "color:#fff;">Search</a></span>
+        </div>
+    </div>
+    <div id="snackbar"></div>
+
+    <div id="myIngredients" class='ingredientCarousel'>
+        <span class="carouselHeader">Pantry<a href="javascript:void(0)" onclick="closeNav()" style ="float:right;position:relative;color:#fff;">&times;</a></span>
+        <div class='single-item'>
+            {% for i in ingredients %} {% set value = i.name %}
+            <div onclick="newElementFromPantry('{{ value }}')" style="line-height: 48.3vw; text-align:center; background-color:#fff; background:linear-gradient(rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.4)), url({{ i.imageUrl }}); background-repeat:no-repeat;background-size:100% 100%; height:24.15vw;">
+                <span style="color:#fff; display: inline-block; vertical-align: super; line-height: normal;">{{value}}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
-<script type="text/javascript">
-    $(document).on('ready', function() {
-        $('.responsive').slick({
-            dots: false,
-            infinite: false,
-            speed: 300,
-            slidesToShow: 3,
-            slidesToScroll: 3,
-            autoplay: true,
-            autoplaySpeed: 9000
-        });
-    });
-
-    function openNav() {
-        document.getElementById("myPantry").style.width = "100%";
-    }
-
-    function closeNav() {
-        document.getElementById("myPantry").style.width = "0";
-    }
-
-    // Create a "close" button and append it to each list item
-    var myNodelist = document.getElementsByTagName("LI");
-    var i;
-    for (i = 0; i < myNodelist.length; i++) {
-        var span = document.createElement("SPAN");
-        var txt = document.createTextNode("\u00D7");
-        span.className = "close";
-        span.appendChild(txt);
-        myNodelist[i].appendChild(span);
-    }
-
-    // Click on a close button to hide the current list item
-    var close = document.getElementsByClassName("close");
-    var i;
-    for (i = 0; i < close.length; i++) {
-        close[i].onclick = function() {
-            var div = this.parentElement;
-            div.style.display = "none";
-        }
-    }
-
-    // Create a new list item when clicking on the "Add" button
-    function newElement() {
-        if (document.getElementById("myInput").value === '') {
-            var x = document.getElementById("snackbar")
-            x.innerHTML = "Please enter an ingredient";
-            x.className = "show";
-            setTimeout(function() {
-                x.className = x.className.replace("show", "");
-            }, 3000);
-        } else {
-
-            var check = true;
-            $('#myUL').find('li').each(function() {
-                var innerDivId = $(this).text();
-                innerDivId = innerDivId.slice(0, -1);
-
-                if (innerDivId.toLowerCase() === document.getElementById("myInput").value.toLowerCase())
-                    check = false;
-            });
-
-            if (check) {
-
-                var out = document.getElementById("ingredientBank");
-                var li = document.createElement("li");
-                var inputValue = document.getElementById("myInput").value;
-                var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
-                var t = document.createTextNode(inputValue);
-                li.appendChild(t);
-                document.getElementById("myUL").appendChild(li);
-
-                document.getElementById("myInput").value = "";
-
-                var span = document.createElement("SPAN");
-                var txt = document.createTextNode("\u00D7");
-                span.className = "close";
-                span.appendChild(txt);
-                li.appendChild(span);
-
-                if (isScrolledToBottom)
-                    out.scrollTop = out.scrollHeight - out.clientHeight;
-
-                for (i = 0; i < close.length; i++) {
-                    close[i].onclick = function() {
-                        var div = this.parentElement;
-                        div.style.display = "none";
-                    }
-                }
-            } else {
-                var x = document.getElementById("snackbar")
-                x.innerHTML = "'" + document.getElementById("myInput").value + "' has already been added";
-                x.className = "show";
-                setTimeout(function() {
-                    x.className = x.className.replace("show", "");
-                }, 3000);
-            }
-        }
-    }
+<div id = "recipeResults" class="results">
+    <input id="ingredientList" type="hidden" size="1000" name="a">
+    <div id = "recipeDiv"></div>
+</div>
 
 
-    function newElementFromPantry(name) {
-        var out = document.getElementById("ingredientBank");
-        var li = document.createElement("li");
-        var inputValue = name;
 
-        var check = true;
-        $('#myUL').find('li').each(function() {
-            var innerDivId = $(this).text();
-            innerDivId = innerDivId.slice(0, -1);
-            if (innerDivId.toLowerCase() === name.toLowerCase())
-                check = false;
-        });
-
-        if (check) {
-
-            var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
-
-            var t = document.createTextNode(inputValue);
-            li.appendChild(t);
-            if (inputValue === '') {
-                alert("No Ingredient Entered!");
-            } else {
-                document.getElementById("myUL").appendChild(li);
-            }
-            document.getElementById("myInput").value = "";
-
-            var span = document.createElement("SPAN");
-            var txt = document.createTextNode("\u00D7");
-            span.className = "close";
-            span.appendChild(txt);
-            li.appendChild(span);
-
-            if (isScrolledToBottom)
-                out.scrollTop = out.scrollHeight - out.clientHeight;
-
-            for (i = 0; i < close.length; i++) {
-                close[i].onclick = function() {
-                    var div = this.parentElement;
-                    div.style.display = "none";
-                }
-            }
-        } else {
-            var x = document.getElementById("snackbar")
-            x.innerHTML = "'" + name + "' has already been added";
-            x.className = "show";
-            setTimeout(function() {
-                x.className = x.className.replace("show", "");
-            }, 3000);
-        }
-    }
-</script>
 {% endblock %}

@@ -1,8 +1,9 @@
-from app import app, db, admin
+from app import app, db, admin, ma
 from flask_admin.contrib.sqla import ModelView
 from flask_user import login_required, UserManager, UserMixin, SQLAlchemyAdapter
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import Column, Integer, ForeignKey, exists, or_
+from flask.json import JSONEncoder
 
 
 
@@ -48,6 +49,15 @@ class Recipe(db.Model):
     title = db.Column(db.String(255),nullable=False)
     imageUrl = db.Column(db.String, nullable=False)
 
+
+    #def __init__(self, **kwargs):
+    #    super(Recipe, self).__init__(**kwargs)
+
+    def __init__(self, id, title, imageUrl):
+            self.id = id
+            self.title = title
+            self.imageUrl = imageUrl
+
     #One-to-One relationship between Recipe and Detail
     detail = relationship("Detail", uselist=False, back_populates="recipe")
     #One-to-One relationship between Recipe and NutritionFact
@@ -67,8 +77,17 @@ class Recipe(db.Model):
     #Many-to-Many relationship between Recipe and Equipment
     equipments = db.relationship('Equipment', secondary=equipments, lazy='subquery', backref=db.backref('recipes',lazy=True))
 
+class RecipeJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Recipe):
+            return {
+                   'id'         : obj.id,
+                   'title'      : obj.title,
+                   'imageUrl'   : obj.imageUrl
+            }
+        return super(RecipeJSONEncoder, self).default(obj)
+
 class Detail(db.Model):
-    __tablename__ = 'detail'
     id = db.Column(db.Integer, primary_key=True)
     recipeSourceName = db.Column(db.String, nullable=False)
     recipeSourceUrl = db.Column(db.String, nullable=False)
@@ -78,6 +97,7 @@ class Detail(db.Model):
     saveCount = db.Column(db.Integer, nullable=False)
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'))
     recipe = relationship("Recipe", back_populates="detail")
+
 
 class Cuisine(db.Model):
     __tablename__ = 'cuisine'
@@ -176,3 +196,4 @@ admin.add_view(ModelView(Equipment, db.session))
 
 db_adapter = SQLAlchemyAdapter(db, User)
 user_manager = UserManager(db_adapter, app)
+app.json_encoder = RecipeJSONEncoder
