@@ -353,3 +353,8 @@ def byIngredientSearch():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
+
+@app.route('/savedRecipes')
+def savedRecipes():
+    recipes = User.query.filter(User.id == current_user.get_id()).first().savedRecipes
+    return render_template('savedRecipes.html', recipes=recipes)

@@ -1,29 +1,98 @@
-<script>
-$(function() {
-    var save_form = function(e) {
+{% extends "layout.html" %} {% block results %}
 
-        recipeID = 0
+<style>
+    h5 {
+        color: grey;
+        text-align: left;
+    }
 
-        document.getElementById("saveForm").value = recipeID
+    h4 {
+        color: black;
+        text-align: left;
+    }
 
-        $.getJSON($SCRIPT_ROOT + '/saveRecipe', {
-            //<input id="saveForm" type="hidden" size="1000" name="recipe">
-            recipe: $('input[name="recipe"]').val()
+    body {
+        background: #fff;
+    }
 
-        }, function(data) {
+    .navbar-brand {
+        font-size: 24px;
+        color: #fff;
+    }
 
-            alert('Recipe Added');
+    .navbar {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border: 0;
+        border-radius: 0;
+        margin-bottom: 0;
+        font-size: 12px;
+        letter-spacing: 5px;
+        font-size: 18px;
+        background-color: #1abc9c;
+        color: #fff;
+    }
 
-            //do something to confirm that the recipe has been added
+    form {
+        box-shadow: 0 0 2px 1px #f2f2f2;
+        border: solid 1px #e6e6e6;
+        display: block;
+        background-color: #fff;
+        width: auto;
+    }
 
-        });
-        return false;
-    };
-    $('button#saveButton').bind('click', save_form);
-    $('input[type=text]').bind('keydown', function(e) {
-        if (e.keyCode == 13) {
-            save_form(e);
-        }
-    });
-});
-</script>
+    .form-wrapper {
+        width: 350px;
+        margin: 20px auto;
+    }
+
+    .text-center {
+        text-align: center;
+        padding: 10px;
+    }
+    .blk-font
+    {
+      color: black;
+    }
+    .pagination-page-info {
+    padding: .6em;
+    padding-left: 0;
+    width: 40em;
+    margin: .5em;
+    margin-left: 0;
+    font-size: 12px;
+}
+.pagination-page-info b {
+    color: black;
+    background: #6aa6ed;
+    padding-left: 2px;
+    padding: .1em .25em;
+    font-size: 150%;
+}
+</style>
+<div class="container-fluid" style="margin-top:20px;">
+
+    <h4>{{recipes|length}} recipe results including <i> {{inputIngredients}} </i></h4>
+    {% for recipe in recipes %}
+    <p></p>
+    <div class="form-wrapper">
+        <form class="text-center" method="POST" action="/recipeDetails">
+            <input type="image" src={{ recipe[0].imageUrl }} width="330px" height="auto" name="recipeID" value={{ recipe[0].id }} alt="Submit">
+            <h4>{{recipe[0].title}}</h4>
+            <h5>Soy-and-Ginger-Glazed Salmon with Udon Noodles is a main course that serves 4. It is brought to you by Food and Wine. </h5>
+            <h5>Matched:<span style ="color:#1abc9c;">{{recipe[1]}}</span> Missed: <span style ="color:red">{{recipe[2]}}</span></h5>
+            <p style="border-bottom: 2px solid #f2f2f2;"></p>
+            <h5>Recipe by <a href={{recipe[0].detail.recipeSourceUrl}}><span style ="color:black; text-weight:bold;">{{recipe[0].detail.recipeSourceName}}</span></a></h5>
+            <div style="color: black; font-size:16px; text-align:left;">
+              <span class="glyphicon glyphicon-cutlery" style="color:orange;"></span> {{recipe[0].detail.servings}} servings
+              <span class="glyphicon glyphicon-heart" style="color:red;"></span> {{recipe[0].detail.saveCount}} likes
+              <span class="glyphicon glyphicon-time" style="color:purple;"></span> {{recipe[0].detail.readyInMinutes}} min
+            </div>
+        </form>
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
