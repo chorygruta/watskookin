@@ -1,5 +1,6 @@
 from flask import request, render_template, redirect,url_for, request, jsonify
 from flask_wtf import FlaskForm
+from flask_user import current_user
 from difflib import SequenceMatcher
 from app import app
 from models import *
@@ -54,14 +55,51 @@ class searchRecipe(object):
     missedIngredient = 0
     usedIngredient = 0
 
-def addIngredient(userObj, ingredientObj):
-    UserObj.savedIngredients.append(IngredientObj)
+def addIngredientToUserFunction(userObj, ingredientObj):
+    userObj.savedIngredients.append(ingredientObj)
     db.session.commit()
 
-def saveRecipe(userObj, recipeObj):
-    UserObj.savedRecipes.append(recipeObj)
+def saveRecipeFunction(userObj, recipeObj):
+    userObj.savedRecipes.append(recipeObj)
     db.session.commit()
 
+@app.route('/addIngredient', methods=['GET', 'POST'])
+@login_required
+def addIngredient():
+    user_id = current_user.get_id()
+    form = getIngredientForm()
+
+    if form.validate_on_submit():
+        ingredientObj = Ingredient.query.filter_by(name=form.name.data).first()
+        currentUserObj = User.query.filter_by(id=current_user.get_id()).first()
+        addIngredientToUserFunction(currentUserObj, ingredientObj)
+        return '<h1>The name of the ingredient is {}.'.format(form.name.data)
+
+    return render_template('addIngredient.html', form=form)
+
+@app.route('/pantry', methods=['GET', 'POST'])
+def pantry():
+    user_id = current_user.get_id()
+
+    userobj = User.query.filter(User.id == user_id).first()
+    x = userobj.savedIngredients
+
+    ingredients = ""
+    for i in x:
+        ingredients += i.name + ' ' + str(i.id) + ' ' + i.imageUrl
+    return ingredients
+
+@app.route('/saveRecipe', methods=['GET', 'POST'])
+@login_required
+def saveRecipeProcess():
+    #get the recipe ID
+    recipe_id = request.args.get('recipe', 0, type=str)
+
+    recipeObj = Recipe.query.filter(Recipe.id == recipe_id).first()
+    userObj = User.query.filter(User.id == current_user.get_id()).first()
+    saveRecipeFunction(userObj, recipeObj)
+
+    return jsonify(recipeObj)
 
 
 
@@ -103,6 +141,7 @@ def parseIngredients(ingredientList):
         counter += 1
 
     return finalIngredientList
+
 
 @app.route('/results', methods=['GET', 'POST'])
 @app.route('/results/<int:page>', methods=['GET', 'POST'])
@@ -199,8 +238,8 @@ def search():
     ingredients = Ingredient.query.all()
     return render_template('search.html', ingredients = ingredients)
 
-@app.route('/_add_numbers')
-def add_numbers():
+@app.route('/processSearch')
+def processSearch():
     a = request.args.get('a', 0, type=str)
     b = request.args.get('b', 0, type=str)
 
@@ -299,28 +338,6 @@ def add_numbers():
     #result = json.dumps(r.__dict__)
     return jsonify(temp)
     # jsonify(result=ingredientList, recipes=result)
-
-@app.route('/process', methods=['POST'])
-def process():
-    #initializes input with the input values from the form ingredients
-    inputIngredients = request.form['ingredient'].lower()
-    ingredientList = inputIngredients.replace(", ",",").split(",")
-    tempList = []
-
-    for i in ingredientList:
-        if i.endswith('es'):
-            tempList.append(i[:-2])
-        elif i.endswith('s'):
-            tempList.append(i[:-1])
-        else:
-            tempList.append(i)
-
-    ingredientList = tempList
-    inputIngredients = ingredientList
-
-    ingredientList = parseIngredients(ingredientList)
-
-    return ingredientList
 
 
 @app.route('/search/by-ingredients-search')

@@ -1,0 +1,14 @@
+<html>
+<head>
+<title>Add Ingredient</title>
+</head>
+<body>
+  <h3>Add Form</h3>
+  <form method="POST" action="{{ url_for('addIngredient') }}">
+    {{ form.csrf_token }}
+    {{ form.name.label}}
+    {{ form.name }}
+    <input type="submit" value ="Submit">
+  </form>
+</body>
+</html>

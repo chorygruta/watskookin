@@ -1,251 +1,29 @@
 <script>
-    $(document).on('ready', function() {
-        $(".single-item").slick({
-            slidesToShow: 3,
-            slidesToScroll: 3
+$(function() {
+    var save_form = function(e) {
+
+        recipeID = 0
+
+        document.getElementById("saveForm").value = recipeID
+
+        $.getJSON($SCRIPT_ROOT + '/saveRecipe', {
+            //<input id="saveForm" type="hidden" size="1000" name="recipe">
+            recipe: $('input[name="recipe"]').val()
+
+        }, function(data) {
+
+            alert('Recipe Added');
+
+            //do something to confirm that the recipe has been added
+
         });
+        return false;
+    };
+    $('button#saveButton').bind('click', save_form);
+    $('input[type=text]').bind('keydown', function(e) {
+        if (e.keyCode == 13) {
+            save_form(e);
+        }
     });
-
-    function openNav() {
-        $('#myIngredients').css('height', '36.23vw');
-    }
-
-    function closeNav() {
-        $('#myIngredients').css('height', '0');
-    }
-    // Click on a close button to hide the current list item
-    var close = document.getElementsByClassName("close");
-    var i;
-    for (i = 0; i < close.length; i++) {
-        close[i].onclick = function() {
-            var div = this.parentElement;
-            //div.style.display = "none";
-            var parent = document.getElementById("myUL");
-            parent.removeChild(div);
-        }
-    }
-
-    var myNodelist = document.getElementsByTagName("LI");
-    var i;
-    for (i = 0; i < myNodelist.length; i++) {
-        var span = document.createElement("SPAN");
-        var txt = document.createTextNode("\u00D7");
-        span.className = "close";
-        span.appendChild(txt);
-        myNodelist[i].appendChild(span);
-    }
-
-    $(function() {
-        var submit_form = function(e) {
-            var myNode = document.getElementById("recipeResults");
-            while (myNode.firstChild) {
-                myNode.removeChild(myNode.firstChild);
-            }
-            document.getElementById("loader").style.display = "block";
-            $('#myIngredients').css('height', '0');
-            var includedIngredientString = "";
-            var excludedIngredientString = "";
-            $('#myUL').find('li').each(function() {
-                if $(this).attr('class') === 'included' {
-                  includedIngredientString += $(this).text().slice(0, -1) + ', ';
-                }
-                else {
-                  excludedIngredientString += $(this).text().slice(0, -1) + ', ';
-                }
-
-            });
-            includedIngredientString = includedIngredientString.slice(0, -2);
-            excludedIngredientString = excludedIngredientString.slice(0, -2);
-
-            document.getElementById("includedIngredientList").value = includedIngredientString;
-            document.getElementById("excludedIngredientList").value = excludedIngredientString;
-
-            //var searchedIngredients = ingredientString;
-
-            $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
-                a: $('input[name="a"]').val(),
-                b: $('input[name="b"]').val(),
-
-            }, function(data) {
-                var c = $('#resultsCount').clone();
-                if includedIngredientString === "" {
-                  //only excludedIngredientString exists
-                  c.html(data.length + " recipe results excluding '" + excludedIngredientString + "'");
-                }
-                else if excludedIngredientString === "" {
-                  //only includedIngredientString exists
-                  c.html(data.length + " recipe results including '" + includedIngredientString + "'");
-                }
-                else {
-                  //both exists
-                    c.html(data.length + " recipe results including '" + includedIngredientString + "' and excluding '" + excludedIngredientString +"'");
-                }
-
-                c.appendTo("#recipeResults");
-
-                var i;
-                for (i = 0; i < data.length; i++) {
-                    title = data[i].title;
-                    imageUrl = data[i].imageUrl;
-
-                    var d = $('#recipeDiv').clone();
-                    d.html("<div class='resultContainer'><img src=" + imageUrl + " class='img-thumbnail'><p><span>" + title + "</span></p></div>");
-                    //document.getElementsByClassName("resultContainer img").src= imageUrl;
-                    d.appendTo("#recipeResults");
-
-                }
-                document.getElementById("loader").style.display = "none";
-                document.getElementById("recipeResults").style.display = "block";
-                $('#result').text(text);
-            });
-            return false;
-        };
-        $('button#searchB').bind('click', submit_form);
-        $('input[type=text]').bind('keydown', function(e) {
-            if (e.keyCode == 13) {
-                submit_form(e);
-            }
-        });
-    });
-    var close = document.getElementsByClassName("close");
-    var i;
-    for (i = 0; i < close.length; i++) {
-        close[i].onclick = function() {
-            var div = this.parentElement;
-            //div.style.display = "none";
-            var parent = document.getElementById("myUL");
-            parent.removeChild(div);
-        }
-    }
-
-
-    // Create a new list item when clicking on the "Add" button
-    function newElement(x) {
-        if (document.getElementById("myInput").value === '') {
-            var x = document.getElementById("snackbar")
-            x.innerHTML = "Please enter an ingredient";
-            x.className = "show";
-            setTimeout(function() {
-                x.className = x.className.replace("show", "");
-            }, 3000);
-        } else {
-            document.getElementById("searchB").disabled = false;
-            $('#searchB').css('background', '#1abc9c');
-            var check = true;
-            $('#myUL').find('li').each(function() {
-                var innerDivId = $(this).text();
-                innerDivId = innerDivId.slice(0, -1);
-
-                if (innerDivId.toLowerCase() === document.getElementById("myInput").value.toLowerCase())
-                    check = false;
-            });
-
-            if (check) {
-
-                var out = document.getElementById("ingredientBank");
-                var li = document.createElement("li");
-
-                if (x) {li.className = 'included';} else {li.className = 'excluded';}
-
-                var inputValue = document.getElementById("myInput").value;
-                var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
-                var t = document.createTextNode(inputValue);
-                li.appendChild(t);
-                document.getElementById("myUL").appendChild(li);
-
-                document.getElementById("myInput").value = "";
-
-                var span = document.createElement("SPAN");
-                var txt = document.createTextNode("\u00D7");
-                span.className = "close";
-                span.appendChild(txt);
-                li.appendChild(span);
-
-                if (isScrolledToBottom)
-                    out.scrollTop = out.scrollHeight - out.clientHeight;
-
-                for (i = 0; i < close.length; i++) {
-                    close[i].onclick = function() {
-                        var div = this.parentElement;
-                        var parent = document.getElementById("myUL");
-                        parent.removeChild(div);
-
-                        var bank = $('#myUL');
-                        if (bank.children().length < 1) {
-                            document.getElementById("searchB").disabled = true;
-                            $('#searchB').css('background', '#b2b2b2');
-                        }
-                    }
-                }
-            } else {
-                var x = document.getElementById("snackbar")
-                x.innerHTML = "'" + document.getElementById("myInput").value + "' has already been added";
-                x.className = "show";
-                setTimeout(function() {
-                    x.className = x.className.replace("show", "");
-                }, 3000);
-            }
-        }
-    }
-
-
-    function newElementFromPantry(name) {
-        var out = document.getElementById("ingredientBank");
-        var li = document.createElement("li");
-        li.className = 'included';
-        var inputValue = name;
-
-        var check = true;
-        $('#myUL').find('li').each(function() {
-            var innerDivId = $(this).text();
-            innerDivId = innerDivId.slice(0, -1);
-            if (innerDivId.toLowerCase() === name.toLowerCase())
-                check = false;
-        });
-
-        if (check) {
-            document.getElementById("searchB").disabled = false;
-            $('#searchB').css('background', '#1abc9c');
-            var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
-
-            var t = document.createTextNode(inputValue);
-            li.appendChild(t);
-            if (inputValue === '') {
-                alert("No Ingredient Entered!");
-            } else {
-                document.getElementById("myUL").appendChild(li);
-            }
-            document.getElementById("myInput").value = "";
-
-            var span = document.createElement("SPAN");
-            var txt = document.createTextNode("\u00D7");
-            span.className = "close";
-            span.appendChild(txt);
-            li.appendChild(span);
-
-            if (isScrolledToBottom)
-                out.scrollTop = out.scrollHeight - out.clientHeight;
-
-            for (i = 0; i < close.length; i++) {
-                close[i].onclick = function() {
-                    var div = this.parentElement;
-                    var parent = document.getElementById("myUL");
-                    parent.removeChild(div);
-
-                    var bank = $('#myUL');
-                    if (bank.children().length < 1) {
-                        document.getElementById("searchB").disabled = true;
-                        $('#searchB').css('background', '#b2b2b2');
-                    }
-                }
-            }
-        } else {
-            var x = document.getElementById("snackbar")
-            x.innerHTML = "'" + name + "' has already been added";
-            x.className = "show";
-            setTimeout(function() {
-                x.className = x.className.replace("show", "");
-            }, 3000);
-        }
-    }
+});
 </script>

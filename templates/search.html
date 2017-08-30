@@ -60,7 +60,7 @@
             document.getElementById("includedIngredientList").value = includedIngredientString;
             //var searchedIngredients = ingredientString;
 
-            $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
+            $.getJSON($SCRIPT_ROOT + '/processSearch', {
                 a: $('input[name="a"]').val(),
                 b: $('input[name="b"]').val(),
             }, function(data) {
@@ -81,11 +81,13 @@
 
                 var i;
                 for (i = 0; i < data.length; i++) {
+                    id = data[i].id;
                     title = data[i].title;
                     imageUrl = data[i].imageUrl;
 
                     var d = $('#recipeDiv').clone();
-                    d.html("<div class='resultContainer'><img src=" + imageUrl + " class='img-thumbnail'><p><span>" + title + "</span></p></div>");
+                    d.html("<div class='resultContainer'><img src=" + imageUrl + " class='img-thumbnail'><p><span>" + title + "</span></p>"+
+                    "<button type='button' id='saveB' class='btn saveButton' data-recipe-id='" + id + "' onclick='saveRecipe("+ id + ")'>Save Recipe</button><input id='saveForm' type='hidden' size='1000' name='recipe'></div>");
                     //document.getElementsByClassName("resultContainer img").src= imageUrl;
                     d.appendTo("#recipeResults");
 
@@ -103,6 +105,26 @@
             }
         });
     });
+
+    function saveRecipe(x) {
+      alert('triggered');
+      alert(x);
+      recipeID = x;
+
+      document.getElementById("saveForm").value = recipeID;
+
+      $.getJSON($SCRIPT_ROOT + '/saveRecipe', {
+          //<input id="saveForm" type="hidden" size="1000" name="recipe">
+          recipe: $('input[name="recipe"]').val(),
+
+      }, function(data) {
+
+          alert(data.title);
+          //do something to confirm that the recipe has been added
+      });
+      return false;
+    }
+
     var close = document.getElementsByClassName("close");
     var i;
     for (i = 0; i < close.length; i++) {
@@ -669,7 +691,7 @@
 
     <div class="container-fluid search-wrapper">
         <div class="container-fluid" style="width:90vw; margin:0 auto;">
-            <input type="text" id="myInput" placeholder="Add Ingredients">
+            <input type="text" id="myInput" placeholder="Include/exclude ingredients">
 
             <div class="btn-group">
                 <button type="button" class="btn plusBtn glyphicon glyphicon-plus" onclick="newElement(true)"></button>
