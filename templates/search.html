@@ -1,6 +1,6 @@
 {% extends "base-layout.html" %} {% block search %}
 <!--<link rel="stylesheet" type="text/css" href="/static/css/search.css">-->
-<script src="/static/js/search.js"></script>
+<!--<script src="/static/js/search.js"></script>-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css" rel="stylesheet" />
@@ -40,19 +40,43 @@
             }
             document.getElementById("loader").style.display = "block";
             $('#myIngredients').css('height', '0');
-            var ingredientString = "";
+            var includedIngredientString = "";
+            var excludedIngredientString = "";
             $('#myUL').find('li').each(function() {
-                ingredientString += $(this).text().slice(0, -1) + ', ';
+                if ($(this).attr('class') === "included") {
+
+                    includedIngredientString += $(this).text().slice(0, -1) + ', ';
+                } else {
+
+                    excludedIngredientString += $(this).text().slice(0, -1) + ', ';
+                }
             });
-            ingredientString = ingredientString.slice(0, -2);
-            document.getElementById("ingredientList").value = ingredientString;
-            var searchedIngredients = ingredientString;
+            includedIngredientString = includedIngredientString.slice(0, -2);
+            excludedIngredientString = excludedIngredientString.slice(0, -2);
+
+
+            document.getElementById("excludedIngredientList").value = excludedIngredientString;
+
+            document.getElementById("includedIngredientList").value = includedIngredientString;
+            //var searchedIngredients = ingredientString;
 
             $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
                 a: $('input[name="a"]').val(),
+                b: $('input[name="b"]').val(),
             }, function(data) {
                 var c = $('#resultsCount').clone();
-                c.html(data.length + " recipe results including '" + searchedIngredients + "'");
+
+                if (includedIngredientString === "") {
+                    //only excludedIngredientString exists
+                    c.html(data.length + " recipe results excluding '" + excludedIngredientString + "'");
+                } else if (excludedIngredientString === "") {
+                    //only includedIngredientString exists
+                    c.html(data.length + " recipe results including '" + includedIngredientString + "'");
+                } else {
+                    //both exists
+                    c.html(data.length + " recipe results including '" + includedIngredientString + "' and excluding '" + excludedIngredientString + "'");
+                }
+
                 c.appendTo("#recipeResults");
 
                 var i;
@@ -68,7 +92,7 @@
                 }
                 document.getElementById("loader").style.display = "none";
                 document.getElementById("recipeResults").style.display = "block";
-                $('#result').text(text);
+
             });
             return false;
         };
@@ -91,7 +115,7 @@
     }
 
     // Create a new list item when clicking on the "Add" button
-    function newElement() {
+    function newElement(x) {
         if (document.getElementById("myInput").value === '') {
             var x = document.getElementById("snackbar")
             x.innerHTML = "Please enter an ingredient";
@@ -115,6 +139,13 @@
 
                 var out = document.getElementById("ingredientBank");
                 var li = document.createElement("li");
+
+                if (x) {
+                    li.className = 'included';
+                } else {
+                    li.className = 'excluded';
+                }
+
                 var inputValue = document.getElementById("myInput").value;
                 var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
                 var t = document.createTextNode(inputValue);
@@ -160,6 +191,7 @@
     function newElementFromPantry(name) {
         var out = document.getElementById("ingredientBank");
         var li = document.createElement("li");
+        li.className = 'included';
         var inputValue = name;
 
         var check = true;
@@ -279,13 +311,7 @@
         transition: width 0.4s ease-in-out;
         border-bottom-left-radius: 1.2vw;
         border-top-left-radius: 1.2vw;
-    }
-
-    .btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
+        height: 10.58vw;
     }
 
     .search-wrapper {
@@ -320,13 +346,13 @@
     }
 
     .word-bank {
+        border-radius: 1.2vw;
         overflow: auto;
         width: 90vw;
         height: 27.17vh;
         margin: 2.4vw auto;
         padding: 1.2vw;
         border: 0.4vw solid grey;
-        border-radius: 1.2vw;
     }
 
     .pantry {
@@ -426,7 +452,7 @@
         position: relative;
         display: inline-block;
         vertical-align: middle;
-        height: 10.145vw;
+        height: 10.58vw;
         width: 26.81vw;
         top: -0.24vw;
     }
@@ -443,6 +469,8 @@
         cursor: pointer;
         transition: 0.3s;
         z-index: 2;
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
     }
 
     .minusBtn {
@@ -548,18 +576,19 @@
     }
 
     #loader {
-      position: relative;
-      display: none;
-      z-index: 1;
-      border: 3.86vw solid #f3f3f3;
-      border-radius: 50%;
-      border-top: 3.86vw solid #1abc9c;
-      width: 28.98vw;
-      height: 28.98vw;
-      -webkit-animation: spin 2s linear infinite;
-      animation: spin 2s linear infinite;
-      top: 5vh;
-      margin: 0 auto;
+        position: relative;
+        display: none;
+        z-index: 1;
+        width: 36.23vw;
+        height: 36.23vw;
+        margin: 3vh auto;
+        border: 3.86vw solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 3.86vw solid #1abc9c;
+        width: 28.98vw;
+        height: 28.98vw;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite
     }
 
     @-webkit-keyframes spin {
@@ -586,7 +615,7 @@
         -webkit-animation-name: results;
         -webkit-animation-duration: 1s;
         animation-name: results;
-        animation-duration: 1s
+        animation-duration: 1s;
     }
 
     @-webkit-keyframes results {
@@ -621,6 +650,14 @@
         font-weight: bold;
         text-decoration: none;
     }
+
+    .excluded {
+        color: #ff7f7f;
+    }
+
+    .included {
+        color: #1abc9c;
+    }
 </style>
 
 <div id="body-wrapper">
@@ -632,11 +669,11 @@
 
     <div class="container-fluid search-wrapper">
         <div class="container-fluid" style="width:90vw; margin:0 auto;">
-            <input type="text" id="myInput" placeholder="Include/exclude ingredients">
+            <input type="text" id="myInput" placeholder="Add Ingredients">
 
             <div class="btn-group">
-                <button type="button" class="btn plusBtn glyphicon glyphicon-plus" onclick="newElement()"></button>
-                <button type="button" class="btn minusBtn glyphicon glyphicon-minus" onclick="newElement()"></button>
+                <button type="button" class="btn plusBtn glyphicon glyphicon-plus" onclick="newElement(true)"></button>
+                <button type="button" class="btn minusBtn glyphicon glyphicon-minus" onclick="newElement(false)"></button>
             </div>
 
 
@@ -667,8 +704,8 @@
     <div id="resultsCount" style="color:#fff;"></div>
 
     <div id="loader"></div>
-    <input id="excludedingredientList" type="hidden" size="1000" name="b">
-    <input id="ingredientList" type="hidden" size="1000" name="a">
+    <input id="excludedIngredientList" type="hidden" size="1000" name="b">
+    <input id="includedIngredientList" type="hidden" size="1000" name="a">
 
     <div id="recipeResults" class="results">
     </div>

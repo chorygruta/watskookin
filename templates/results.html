@@ -1,98 +1,251 @@
-{% extends "layout.html" %} {% block results %}
+<script>
+    $(document).on('ready', function() {
+        $(".single-item").slick({
+            slidesToShow: 3,
+            slidesToScroll: 3
+        });
+    });
 
-<style>
-    h5 {
-        color: grey;
-        text-align: left;
+    function openNav() {
+        $('#myIngredients').css('height', '36.23vw');
     }
 
-    h4 {
-        color: black;
-        text-align: left;
+    function closeNav() {
+        $('#myIngredients').css('height', '0');
+    }
+    // Click on a close button to hide the current list item
+    var close = document.getElementsByClassName("close");
+    var i;
+    for (i = 0; i < close.length; i++) {
+        close[i].onclick = function() {
+            var div = this.parentElement;
+            //div.style.display = "none";
+            var parent = document.getElementById("myUL");
+            parent.removeChild(div);
+        }
     }
 
-    body {
-        background: #fff;
+    var myNodelist = document.getElementsByTagName("LI");
+    var i;
+    for (i = 0; i < myNodelist.length; i++) {
+        var span = document.createElement("SPAN");
+        var txt = document.createTextNode("\u00D7");
+        span.className = "close";
+        span.appendChild(txt);
+        myNodelist[i].appendChild(span);
     }
 
-    .navbar-brand {
-        font-size: 24px;
-        color: #fff;
+    $(function() {
+        var submit_form = function(e) {
+            var myNode = document.getElementById("recipeResults");
+            while (myNode.firstChild) {
+                myNode.removeChild(myNode.firstChild);
+            }
+            document.getElementById("loader").style.display = "block";
+            $('#myIngredients').css('height', '0');
+            var includedIngredientString = "";
+            var excludedIngredientString = "";
+            $('#myUL').find('li').each(function() {
+                if $(this).attr('class') === 'included' {
+                  includedIngredientString += $(this).text().slice(0, -1) + ', ';
+                }
+                else {
+                  excludedIngredientString += $(this).text().slice(0, -1) + ', ';
+                }
+
+            });
+            includedIngredientString = includedIngredientString.slice(0, -2);
+            excludedIngredientString = excludedIngredientString.slice(0, -2);
+
+            document.getElementById("includedIngredientList").value = includedIngredientString;
+            document.getElementById("excludedIngredientList").value = excludedIngredientString;
+
+            //var searchedIngredients = ingredientString;
+
+            $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
+                a: $('input[name="a"]').val(),
+                b: $('input[name="b"]').val(),
+
+            }, function(data) {
+                var c = $('#resultsCount').clone();
+                if includedIngredientString === "" {
+                  //only excludedIngredientString exists
+                  c.html(data.length + " recipe results excluding '" + excludedIngredientString + "'");
+                }
+                else if excludedIngredientString === "" {
+                  //only includedIngredientString exists
+                  c.html(data.length + " recipe results including '" + includedIngredientString + "'");
+                }
+                else {
+                  //both exists
+                    c.html(data.length + " recipe results including '" + includedIngredientString + "' and excluding '" + excludedIngredientString +"'");
+                }
+
+                c.appendTo("#recipeResults");
+
+                var i;
+                for (i = 0; i < data.length; i++) {
+                    title = data[i].title;
+                    imageUrl = data[i].imageUrl;
+
+                    var d = $('#recipeDiv').clone();
+                    d.html("<div class='resultContainer'><img src=" + imageUrl + " class='img-thumbnail'><p><span>" + title + "</span></p></div>");
+                    //document.getElementsByClassName("resultContainer img").src= imageUrl;
+                    d.appendTo("#recipeResults");
+
+                }
+                document.getElementById("loader").style.display = "none";
+                document.getElementById("recipeResults").style.display = "block";
+                $('#result').text(text);
+            });
+            return false;
+        };
+        $('button#searchB').bind('click', submit_form);
+        $('input[type=text]').bind('keydown', function(e) {
+            if (e.keyCode == 13) {
+                submit_form(e);
+            }
+        });
+    });
+    var close = document.getElementsByClassName("close");
+    var i;
+    for (i = 0; i < close.length; i++) {
+        close[i].onclick = function() {
+            var div = this.parentElement;
+            //div.style.display = "none";
+            var parent = document.getElementById("myUL");
+            parent.removeChild(div);
+        }
     }
 
-    .navbar {
-        padding-top: 5px;
-        padding-bottom: 5px;
-        border: 0;
-        border-radius: 0;
-        margin-bottom: 0;
-        font-size: 12px;
-        letter-spacing: 5px;
-        font-size: 18px;
-        background-color: #1abc9c;
-        color: #fff;
+
+    // Create a new list item when clicking on the "Add" button
+    function newElement(x) {
+        if (document.getElementById("myInput").value === '') {
+            var x = document.getElementById("snackbar")
+            x.innerHTML = "Please enter an ingredient";
+            x.className = "show";
+            setTimeout(function() {
+                x.className = x.className.replace("show", "");
+            }, 3000);
+        } else {
+            document.getElementById("searchB").disabled = false;
+            $('#searchB').css('background', '#1abc9c');
+            var check = true;
+            $('#myUL').find('li').each(function() {
+                var innerDivId = $(this).text();
+                innerDivId = innerDivId.slice(0, -1);
+
+                if (innerDivId.toLowerCase() === document.getElementById("myInput").value.toLowerCase())
+                    check = false;
+            });
+
+            if (check) {
+
+                var out = document.getElementById("ingredientBank");
+                var li = document.createElement("li");
+
+                if (x) {li.className = 'included';} else {li.className = 'excluded';}
+
+                var inputValue = document.getElementById("myInput").value;
+                var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
+                var t = document.createTextNode(inputValue);
+                li.appendChild(t);
+                document.getElementById("myUL").appendChild(li);
+
+                document.getElementById("myInput").value = "";
+
+                var span = document.createElement("SPAN");
+                var txt = document.createTextNode("\u00D7");
+                span.className = "close";
+                span.appendChild(txt);
+                li.appendChild(span);
+
+                if (isScrolledToBottom)
+                    out.scrollTop = out.scrollHeight - out.clientHeight;
+
+                for (i = 0; i < close.length; i++) {
+                    close[i].onclick = function() {
+                        var div = this.parentElement;
+                        var parent = document.getElementById("myUL");
+                        parent.removeChild(div);
+
+                        var bank = $('#myUL');
+                        if (bank.children().length < 1) {
+                            document.getElementById("searchB").disabled = true;
+                            $('#searchB').css('background', '#b2b2b2');
+                        }
+                    }
+                }
+            } else {
+                var x = document.getElementById("snackbar")
+                x.innerHTML = "'" + document.getElementById("myInput").value + "' has already been added";
+                x.className = "show";
+                setTimeout(function() {
+                    x.className = x.className.replace("show", "");
+                }, 3000);
+            }
+        }
     }
 
-    form {
-        box-shadow: 0 0 2px 1px #f2f2f2;
-        border: solid 1px #e6e6e6;
-        display: block;
-        background-color: #fff;
-        width: auto;
+
+    function newElementFromPantry(name) {
+        var out = document.getElementById("ingredientBank");
+        var li = document.createElement("li");
+        li.className = 'included';
+        var inputValue = name;
+
+        var check = true;
+        $('#myUL').find('li').each(function() {
+            var innerDivId = $(this).text();
+            innerDivId = innerDivId.slice(0, -1);
+            if (innerDivId.toLowerCase() === name.toLowerCase())
+                check = false;
+        });
+
+        if (check) {
+            document.getElementById("searchB").disabled = false;
+            $('#searchB').css('background', '#1abc9c');
+            var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
+
+            var t = document.createTextNode(inputValue);
+            li.appendChild(t);
+            if (inputValue === '') {
+                alert("No Ingredient Entered!");
+            } else {
+                document.getElementById("myUL").appendChild(li);
+            }
+            document.getElementById("myInput").value = "";
+
+            var span = document.createElement("SPAN");
+            var txt = document.createTextNode("\u00D7");
+            span.className = "close";
+            span.appendChild(txt);
+            li.appendChild(span);
+
+            if (isScrolledToBottom)
+                out.scrollTop = out.scrollHeight - out.clientHeight;
+
+            for (i = 0; i < close.length; i++) {
+                close[i].onclick = function() {
+                    var div = this.parentElement;
+                    var parent = document.getElementById("myUL");
+                    parent.removeChild(div);
+
+                    var bank = $('#myUL');
+                    if (bank.children().length < 1) {
+                        document.getElementById("searchB").disabled = true;
+                        $('#searchB').css('background', '#b2b2b2');
+                    }
+                }
+            }
+        } else {
+            var x = document.getElementById("snackbar")
+            x.innerHTML = "'" + name + "' has already been added";
+            x.className = "show";
+            setTimeout(function() {
+                x.className = x.className.replace("show", "");
+            }, 3000);
+        }
     }
-
-    .form-wrapper {
-        width: 350px;
-        margin: 20px auto;
-    }
-
-    .text-center {
-        text-align: center;
-        padding: 10px;
-    }
-    .blk-font
-    {
-      color: black;
-    }
-    .pagination-page-info {
-    padding: .6em;
-    padding-left: 0;
-    width: 40em;
-    margin: .5em;
-    margin-left: 0;
-    font-size: 12px;
-}
-.pagination-page-info b {
-    color: black;
-    background: #6aa6ed;
-    padding-left: 2px;
-    padding: .1em .25em;
-    font-size: 150%;
-}
-</style>
-<div class="container-fluid" style="margin-top:20px;">
-
-    <h4>{{recipes|length}} recipe results including <i> {{inputIngredients}} </i></h4>
-    {% for recipe in recipes %}
-    <p></p>
-    <div class="form-wrapper">
-        <form class="text-center" method="POST" action="/recipeDetails">
-            <input type="image" src={{ recipe[0].imageUrl }} width="330px" height="auto" name="recipeID" value={{ recipe[0].id }} alt="Submit">
-            <h4>{{recipe[0].title}}</h4>
-            <h5>Soy-and-Ginger-Glazed Salmon with Udon Noodles is a main course that serves 4. It is brought to you by Food and Wine. </h5>
-            <h5>Matched:<span style ="color:#1abc9c;">{{recipe[1]}}</span> Missed: <span style ="color:red">{{recipe[2]}}</span></h5>
-            <p style="border-bottom: 2px solid #f2f2f2;"></p>
-            <h5>Recipe by <a href={{recipe[0].detail.recipeSourceUrl}}><span style ="color:black; text-weight:bold;">{{recipe[0].detail.recipeSourceName}}</span></a></h5>
-            <div style="color: black; font-size:16px; text-align:left;">
-              <span class="glyphicon glyphicon-cutlery" style="color:orange;"></span> {{recipe[0].detail.servings}} servings
-              <span class="glyphicon glyphicon-heart" style="color:red;"></span> {{recipe[0].detail.saveCount}} likes
-              <span class="glyphicon glyphicon-time" style="color:purple;"></span> {{recipe[0].detail.readyInMinutes}} min
-            </div>
-        </form>
-    </div>
-
-    {% endfor %}
-
-</div>
-
-{% endblock %}
+</script>

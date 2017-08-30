@@ -202,6 +202,24 @@ def search():
 @app.route('/_add_numbers')
 def add_numbers():
     a = request.args.get('a', 0, type=str)
+    b = request.args.get('b', 0, type=str)
+
+    excludedIngredients = b.lower()
+    excludedIngredientList = excludedIngredients.replace(", ",",").split(",")
+    excludedTempList = []
+
+    for i in excludedIngredientList:
+        if i.endswith('es'):
+            excludedTempList.append(i[:-2])
+        elif i.endswith('s'):
+            excludedTempList.append(i[:-1])
+        else:
+            excludedTempList.append(i)
+
+    excludedIngredientList = excludedTempList
+    excludedIngredientList = parseIngredients(excludedIngredientList)
+    excludedRecipes = Recipe.query.filter(Recipe.ingredients.any(Ingredient.name.in_(excludedIngredientList))).all()
+
     inputIngredients = a.lower()
     ingredientList = inputIngredients.replace(", ",",").split(",")
     tempList = []
@@ -220,6 +238,18 @@ def add_numbers():
     ingredientList = parseIngredients(ingredientList)
 
     recipes = Recipe.query.filter(Recipe.ingredients.any(Ingredient.name.in_(ingredientList))).all()
+
+    tempRecipes = []
+
+
+    for i in recipes:
+        if i in excludedRecipes:
+            print('remove ' + i.title)
+            pass
+        else:
+            tempRecipes.append(i)
+
+    recipes = tempRecipes
 
     rankedRecipesList = []
 
