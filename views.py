@@ -97,11 +97,16 @@ def saveRecipeProcess():
 
     recipeObj = Recipe.query.filter(Recipe.id == recipe_id).first()
     userObj = User.query.filter(User.id == current_user.get_id()).first()
-    saveRecipeFunction(userObj, recipeObj)
 
-    return jsonify(recipeObj)
-
-
+    if recipeObj in userObj.savedRecipes:
+        print('Unsaving this recipe!')
+        userObj.savedRecipes.remove(recipeObj)
+        db.session.commit()
+        return jsonify(isSaved=False)
+    else:
+        print('saving this recipe!')
+        saveRecipeFunction(userObj, recipeObj)
+        return jsonify(isSaved=True)
 
 ######################################################################################################################################################################################
 #parses input ingredients and returns a list of recipes

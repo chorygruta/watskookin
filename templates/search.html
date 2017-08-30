@@ -87,7 +87,7 @@
 
                     var d = $('#recipeDiv').clone();
                     d.html("<div class='resultContainer'><img src=" + imageUrl + " class='img-thumbnail'><p><span>" + title + "</span></p>"+
-                    "<button type='button' id='saveB' class='btn saveButton' data-recipe-id='" + id + "' onclick='saveRecipe("+ id + ")'>Save Recipe</button><input id='saveForm' type='hidden' size='1000' name='recipe'></div>");
+                    "<button type='button' id='"+id+"' class='btn saveButton' data-recipe-id='" + id + "' onclick='saveRecipe("+ id + ")'>Save Recipe</button><input id='saveForm' type='hidden' size='1000' name='recipe'></div>");
                     //document.getElementsByClassName("resultContainer img").src= imageUrl;
                     d.appendTo("#recipeResults");
 
@@ -107,8 +107,6 @@
     });
 
     function saveRecipe(x) {
-      alert('triggered');
-      alert(x);
       recipeID = x;
 
       document.getElementById("saveForm").value = recipeID;
@@ -118,8 +116,16 @@
           recipe: $('input[name="recipe"]').val(),
 
       }, function(data) {
-
-          alert(data.title);
+          id = '#' + String(x)
+          if(data.isSaved){
+            $(id).css('background', '#ff7f7f');
+              //alert('recipe saved');
+          }
+          else {
+            //$(id).css('border', '1px solid #ff7f7f');
+            $(id).css('background', '#fff');
+            //alert('recipe unsaved')
+          }
           //do something to confirm that the recipe has been added
       });
       return false;
@@ -679,6 +685,9 @@
 
     .included {
         color: #1abc9c;
+    }
+    .saveButton {
+      border: 1px solid #ff7f7f;
     }
 </style>
 
