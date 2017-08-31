@@ -101,12 +101,38 @@ def saveRecipeProcess():
     if recipeObj in userObj.savedRecipes:
         print('Unsaving this recipe!')
         userObj.savedRecipes.remove(recipeObj)
+        recipeObj.detail.saveCount -= 1
         db.session.commit()
         return jsonify(isSaved=False)
     else:
         print('saving this recipe!')
         saveRecipeFunction(userObj, recipeObj)
+        recipeObj.detail.saveCount += 1
+        db.session.commit()
         return jsonify(isSaved=True)
+
+@app.route('/saveIngredient', methods=['GET', 'POST'])
+@login_required
+def saveIngredientProcess():
+    #get the recipe ID
+    recipe_id = request.args.get('recipe', 0, type=str)
+
+    recipeObj = Recipe.query.filter(Recipe.id == recipe_id).first()
+    userObj = User.query.filter(User.id == current_user.get_id()).first()
+
+    if recipeObj in userObj.savedRecipes:
+        print('Unsaving this recipe!')
+        userObj.savedRecipes.remove(recipeObj)
+        recipeObj.detail.saveCount -= 1
+        db.session.commit()
+        return jsonify(isSaved=False)
+    else:
+        print('saving this recipe!')
+        saveRecipeFunction(userObj, recipeObj)
+        recipeObj.detail.saveCount += 1
+        db.session.commit()
+        return jsonify(isSaved=True)
+
 
 ######################################################################################################################################################################################
 #parses input ingredients and returns a list of recipes
@@ -343,6 +369,33 @@ def processSearch():
     #result = json.dumps(r.__dict__)
     return jsonify(temp)
     # jsonify(result=ingredientList, recipes=result)
+    a = request.args.get('a', 0, type=str)
+
+@app.route('/processIngredientSearch')
+def processIngredientSearch():
+    ingredient = request.args.get('ingredient', 0, type=str)
+
+    inputIngredients = ingredient.lower()
+    ingredientList = inputIngredients.replace(", ",",").split(",")
+    tempList = []
+
+    for i in ingredientList:
+        if i.endswith('es'):
+            tempList.append(i[:-2])
+        elif i.endswith('s'):
+            tempList.append(i[:-1])
+        else:
+            tempList.append(i)
+
+    ingredientList = tempList
+    inputIngredients = ingredientList
+
+    ingredientList = parseIngredients(ingredientList)
+
+    query.filter(User.name.in_(['leela', 'akshay', 'santanu']))
+
+    ingredientList = Ingredient.query.filter(Ingredient.name.in_(ingredientList))
+    
 
 
 @app.route('/search/by-ingredients-search')
@@ -358,3 +411,17 @@ def index():
 def savedRecipes():
     recipes = User.query.filter(User.id == current_user.get_id()).first().savedRecipes
     return render_template('savedRecipes.html', recipes=recipes)
+
+@app.route('/savedIngredients')
+def savedIngredients():
+    user_id = current_user.get_id()
+    form = getIngredientForm()
+
+    if form.validate_on_submit():
+        ingredientObj = Ingredient.query.filter_by(name=form.name.data).first()
+        currentUserObj = User.query.filter_by(id=current_user.get_id()).first()
+        addIngredientToUserFunction(currentUserObj, ingredientObj)
+        return '<h1>The name of the ingredient is {}.'.format(form.name.data)
+
+    ingredients = User.query.filter(User.id == current_user.get_id()).first().savedIngredients
+    return render_template('savedIngredients.html', ingredients=ingredients, form=form)

@@ -1,70 +1,148 @@
 {% extends "base-layout.html" %} {% block savedRecipes %}
-<style>
-    .text-center {
-      text-align: center;
-      margin: 0 auto;
+<script>
+    function confirmation(x) {
+        divID = String(x) + 'Div';
+        confirmDivID = String(x) + 'confirmDiv';
+        recipeID = x;
+        id = '#' + String(x)
+
+        if ($(id).className == 'glyphicon glyphicon-heart-empty') {
+            $(id).attr('class', 'glyphicon glyphicon-heart');
+        } else {
+            //remove/unsave
+            //document.getElementById(divID).remove();
+            document.getElementById(confirmDivID).style.width = '52.65700483091788vw';
+        }
     }
+
+    function saveRecipe(x, isConfirm) {
+        divID = String(x) + 'Div';
+        confirmDivID = String(x) + 'confirmDiv';
+        recipeID = x;
+        id = '#' + String(x);
+
+        if (isConfirm) {
+            document.getElementById(confirmDivID).style.width = '0%'
+            document.getElementById(divID).remove();
+
+            document.getElementById("saveForm").value = recipeID;
+            $.getJSON($SCRIPT_ROOT + '/saveRecipe', {
+                //<input id="saveForm" type="hidden" size="1000" name="recipe">
+                recipe: $('input[name="recipe"]').val(),
+
+            }, function(data) {
+            });
+        }
+        else {
+          document.getElementById(confirmDivID).style.width = '0%'
+        }
+        return false;
+    }
+</script>
+<style>
+    body {
+      font-size:1em;
+    }
+    .text-center {
+        text-align: center;
+        margin: 0 auto;
+    }
+
     .wrapper {
         overflow: hidden;
-        margin-bottom: 10px;
+        margin-bottom: 1.358695652173913vh;
     }
 
     #one {
-      float: left;
-      width: 166px;
-      border: 1px solid lightgrey;
-      min-height: 110px;
+        float: left;
+        width: 40.09661835748793vw;
+        min-height: 14.945652173913043vh;
     }
 
     #two {
-      overflow: hidden;
-    min-height: 110px;
-    width: 218px;
-    float: right;
-    padding:10px;
+        overflow: hidden;
+        min-height: 14.945652173913043vh;
+        width: 52.65700483091788vw;
+        float: right;
+        padding: 2.4154589371980677vw;
+        position: relative;
     }
-    .card {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-}
-.sr-header {
-  height:30px;
-}
-.glyphicon {
-  font-size:12px;
-  text-align: left;
-}
-</style>
-<div class="container">
 
-    <ul class="nav nav-tabs" style="text-align:center; margin-top:10px;">
+    .confirmDiv {
+        background: #1abc9c;
+        overflow: hidden;
+        height: 14.945652173913043vh;
+        width: 0%;
+        float: right;
+        position: absolute;
+        z-index: 99;
+        display: inline-block;
+        transition: 0.5s;
+        text-align: center;
+    }
+    .confirmDiv p {
+      margin: 1.358695652173913vh 2.4154589371980677vw;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .card {
+        box-shadow: 0 0.24154589371980678vw 0.7246376811594204vw rgba(0, 0, 0, 0.12), 0 0.24154589371980678vw 0.48309178743961356vw rgba(0, 0, 0, 0.24);
+        transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+    }
+
+    .sr-header {
+        height: 4.076086956521739vh;
+    }
+
+    .glyphicon {
+        font-size: 1.4285714285714286em;
+        text-align: left;
+    }
+    .body-wrapper{
+      margin: 0 2.4154589371980677vw;
+    }
+</style>
+<div class="container-fluid body-wrapper">
+
+    <ul class="nav nav-tabs" style="text-align:center; margin-top:1.358695652173913vh;">
         <li class="active" style="width:50%;"><a data-toggle="tab" href="#savedRecipes">Saved Recipes</a></li>
         <li style="width:50%;"><a data-toggle="tab" href="#addRecipe">Add Recipe</a></li>
 
     </ul>
 
-    <div class="tab-content">
-        <div id="savedRecipes" class="tab-pane fade in active">
-            <div class ="sr-header">
+    <div class="tab-content container-fluid">
+        <div id="savedRecipes" class="container-fluid tab-pane fade in active">
+            <div class="container-fluid sr-header">
 
             </div>
             <div>
-              {% for recipe in recipes %}
-                <div class="wrapper card animation-element slide-left">
-                    <div id="one" style ="background: url('{{recipe.imageUrl}}'); background-repeat: no-repeat; background-size: 100% 100%;"></div>
+                {% for recipe in recipes %}
+                <div id="{{recipe.id}}Div" class="container-fluid wrapper card animation-element slide-left">
+                    <div class = "container-fluid" id="one" style="background: url('{{recipe.imageUrl}}'); background-repeat: no-repeat; background-size: 100% 100%;"></div>
 
-                    <div id="two">
-                      <p class ="text-center">{{ recipe.title }}</p>
-                      <h5>Recipe by <a href={{recipe.detail.recipeSourceUrl}}><span style ="color:black; text-weight:bold;">{{recipe.detail.recipeSourceName}}</span></a></h5>
+                    <div id="two" class = "container-fluid">
+                        <span id="{{ recipe.id }}" class = "glyphicon glyphicon-remove" style ="float:right;color:lightblue; font-size:1em;" onclick="confirmation({{recipe.id}})"></span>
+                        <p class="text-center">{{ recipe.title }}</p>
+                        <!--<h5>Recipe by <a href={{recipe.detail.recipeSourceUrl}}><span style ="color:black; text-weight:bold;">{{recipe.detail.recipeSourceName}}</span></a></h5>-->
 
-                      <div class = "text-center">
-                        <span class="glyphicon glyphicon-heart" style="color:red;"></span> {{recipe.detail.saveCount}} likes
-                        <span class="glyphicon glyphicon-time" style="color:purple;"></span> {{recipe.detail.readyInMinutes}} min
-                      </div>
+                        <div class="text-center container-fluid" style="position:absolute; bottom:0; left:50%; margin-bottom: 0.6793478260869565vh;">
+                            <div class = "container-fluid" style="position: relative; left: -50%; width: 52.65700483091788vw;">
+                                <span  class="glyphicon glyphicon-heart" style="color:red;">
+                              <input id="saveForm" type="hidden" size="1000" name="recipe">
+                            </span> {{recipe.detail.saveCount}} likes
+                                <span class="glyphicon glyphicon-time" style="color:purple;"></span> {{recipe.detail.readyInMinutes}} min
+                            </div>
+                        </div>
 
                     </div>
+                    <div id="{{recipe.id}}confirmDiv" class="container-fluid confirmDiv">
+                        <p>Are you sure you want to remove this recipe?</p>
+                        <button type="button" class="btn btn-primary" style="background:#1abc9c;border:0.48309178743961356vw solid #fff;" onclick="saveRecipe({{recipe.id}}, true)"><span class = "glyphicon glyphicon-ok"></span></button>
+                        <button type="button" class="btn btn-primary" style="background:#ff7f7f;border:0.48309178743961356vw solid #fff;" onclick="saveRecipe({{recipe.id}}, false)"><span class = "glyphicon glyphicon-remove"></span></button>
+                    </div>
                 </div>
-              {% endfor %}
+                {% endfor %}
 
 
             </div>

@@ -1,0 +1,168 @@
+{% extends "base-layout.html" %} {% block savedIngredients %}
+<script>
+    function confirmation(x) {
+        divID = String(x) + 'Div';
+        confirmDivID = String(x) + 'confirmDiv';
+        recipeID = x;
+        id = '#' + String(x)
+
+        if ($(id).className == 'glyphicon glyphicon-heart-empty') {
+            $(id).attr('class', 'glyphicon glyphicon-heart');
+        } else {
+            //remove/unsave
+            //document.getElementById(divID).remove();
+            document.getElementById(confirmDivID).style.width = '218px';
+        }
+    }
+
+    function saveRecipe(x, isConfirm) {
+        divID = String(x) + 'Div';
+        confirmDivID = String(x) + 'confirmDiv';
+        recipeID = x;
+        id = '#' + String(x);
+
+        if (isConfirm) {
+            document.getElementById(confirmDivID).style.width = '0%'
+            document.getElementById(divID).remove();
+
+            document.getElementById("saveForm").value = recipeID;
+            $.getJSON($SCRIPT_ROOT + '/saveRecipe', {
+                //<input id="saveForm" type="hidden" size="1000" name="recipe">
+                recipe: $('input[name="recipe"]').val(),
+
+            }, function(data) {});
+        } else {
+            document.getElementById(confirmDivID).style.width = '0%'
+        }
+        return false;
+    }
+
+    function searchIngredient() {
+
+    }
+</script>
+<style>
+    .text-center {
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .wrapper {
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    #one {
+        float: left;
+        width: 166px;
+        border: 1px solid lightgrey;
+        min-height: 110px;
+    }
+
+    #two {
+        overflow: hidden;
+        min-height: 110px;
+        width: 218px;
+        float: right;
+        padding: 10px;
+        position: relative;
+    }
+
+    .confirmDiv {
+        background: #1abc9c;
+        overflow: hidden;
+        height: 110px;
+        width: 0%;
+        float: right;
+        position: absolute;
+        z-index: 99;
+        display: inline-block;
+        transition: 0.5s;
+        text-align: center;
+    }
+
+    .confirmDiv p {
+        margin: 10px 10px;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .card {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+    }
+
+    .sr-header {
+        height: 30px;
+    }
+
+    .glyphicon {
+        font-size: 20px;
+        text-align: left;
+    }
+</style>
+<div class="container">
+
+    <ul class="nav nav-tabs" style="text-align:center; margin-top:10px;">
+        <li class="active" style="width:50%;"><a data-toggle="tab" href="#savedRecipes">Saved Ingredient</a></li>
+        <li style="width:50%;"><a data-toggle="tab" href="#addRecipe">Add Ingredient</a></li>
+
+    </ul>
+
+    <div class="tab-content">
+        <div id="savedRecipes" class="tab-pane fade in active">
+            <div class="sr-header">
+
+            </div>
+            <div>
+                {% for recipe in recipes %}
+                <div id="{{recipe.id}}Div" class="wrapper card animation-element slide-left">
+                    <div id="one" style="background: url('{{recipe.imageUrl}}'); background-repeat: no-repeat; background-size: 100% 100%;"></div>
+
+                    <div id="two">
+                        <span id="{{ recipe.id }}" class="glyphicon glyphicon-remove" style="float:right;color:lightblue; font-size:14px;" onclick="confirmation({{recipe.id}})"></span>
+                        <p class="text-center">{{ recipe.title }}</p>
+                        <!--<h5>Recipe by <a href={{recipe.detail.recipeSourceUrl}}><span style ="color:black; text-weight:bold;">{{recipe.detail.recipeSourceName}}</span></a></h5>-->
+
+                        <div class="text-center" style="position:absolute; bottom:0; left:50%; margin-bottom: 5px;">
+                            <div style="position: relative; left: -50%; width: 218px;">
+                                <span class="glyphicon glyphicon-heart" style="color:red;">
+                              <input id="saveForm" type="hidden" size="1000" name="recipe">
+                            </span> {{recipe.detail.saveCount}} likes
+                                <span class="glyphicon glyphicon-time" style="color:purple;"></span> {{recipe.detail.readyInMinutes}} min
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="{{recipe.id}}confirmDiv" class="confirmDiv">
+                        <p>Are you sure you want to remove this recipe?</p>
+                        <button type="button" class="btn btn-primary" style="background:#1abc9c;border:2px solid #fff;" onclick="saveRecipe({{recipe.id}}, true)"><span class = "glyphicon glyphicon-ok"></span></button>
+                        <button type="button" class="btn btn-primary" style="background:#ff7f7f;border:2px solid #fff;" onclick="saveRecipe({{recipe.id}}, false)"><span class = "glyphicon glyphicon-remove"></span></button>
+                    </div>
+                </div>
+                {% endfor %}
+
+
+            </div>
+        </div>
+        <div id="addRecipe" class="tab-pane fade">
+            <div id="searchDiv" class="searchForm">
+                <h1>Add Ingredient</h1>
+                <div id="loader"></div>
+
+                <p>Enter the name of the Ingredient</p>
+                <input id="ingredientList" name="ingredientInput">
+                <button type="button" id="searchB" class="btn searchBtn">Search</button>
+
+                <div id="ingredientDiv"></div>
+
+                <div id="resultsDiv" class="results">
+                </div>
+            </div>
+
+            <div id="addDiv" class="addForm">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
