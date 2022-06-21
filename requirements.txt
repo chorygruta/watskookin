@@ -30,7 +30,7 @@ lmdb==0.93
 MarkupSafe==1.0
 marshmallow==2.13.6
 marshmallow-sqlalchemy==0.13.1
-numpy==1.13.1
+numpy==1.22.0
 passlib==1.7.1
 pipreqs==0.4.9
 psycopg2==2.7.3
